@@ -3,10 +3,38 @@ import {Activity, ChartNoAxesCombined, CircleCheck, Compass, Radar, Search, Shie
 import Brand from "@/components/Brand";
 
 const perks=[
- {icon:Radar,title:"Discover fresh launches",body:"Browse new Pump.fun-origin tokens and look up markets by contract address. Real prices where available.",scene:"discovery",alt:"Illustrative new-token discovery dashboard"},
- {icon:SlidersHorizontal,title:"Pick your direction",body:"Go long or short in a safe simulation. Adjust virtual collateral and leverage before opening a paper position.",scene:"position",alt:"Illustrative long and short trading controls"},
- {icon:ChartNoAxesCombined,title:"Track every position",body:"Monitor entry prices, market moves and simulated P&L. Close positions and review your trading history.",scene:"performance",alt:"Illustrative token price chart and position tracking dashboard"}
+ {icon:Radar,title:"Discover fresh launches",body:"Browse new Pump.fun-origin tokens and look up markets by contract address. Real prices where available.",scene:"discovery"},
+ {icon:SlidersHorizontal,title:"Pick your direction",body:"Go long or short in a safe simulation. Adjust virtual collateral and leverage before opening a paper position.",scene:"position"},
+ {icon:ChartNoAxesCombined,title:"Track every position",body:"Monitor entry prices, market moves and simulated P&L. Close positions and review your trading history.",scene:"performance"}
 ];
+type PreviewScene = "discovery" | "position" | "performance";
+function FeaturePreview({scene}:{scene:PreviewScene}){
+ if(scene==="discovery") return <div className="feature-art feature-preview preview-discovery" role="img" aria-label="Crisp token discovery interface illustration">
+   <div className="preview-bar"><strong><span className="preview-dot"/> Market discovery</strong><span className="preview-label">LIVE DATA</span></div>
+   <div className="preview-search"><Search size={16}/> Search a token or mint address</div>
+   <div className="preview-token-row"><span className="preview-avatar"><Radar size={18}/></span><span><b>New launches</b><small>Pump.fun discovery</small></span><span className="preview-tag">Explore</span></div>
+   <div className="preview-token-row"><span className="preview-avatar muted"><Activity size={18}/></span><span><b>Market activity</b><small>Price & liquidity data</small></span><span className="preview-bars"><i/><i/><i/></span></div>
+ </div>;
+ if(scene==="position") return <div className="feature-art feature-preview preview-position" role="img" aria-label="Crisp paper trading position controls illustration">
+   <div className="preview-bar"><strong>Choose a side</strong><span className="preview-label">SIMULATED</span></div>
+   <div className="preview-direction"><span className="selected">Long</span><span>Short</span></div>
+   <div className="preview-input-label">Virtual collateral <strong>USDC</strong></div>
+   <div className="preview-amount">100.00 <span>USDC</span></div>
+   <div className="preview-leverage"><span>1×</span><span className="selected">2×</span><span>3×</span></div>
+ </div>;
+ return <div className="feature-art feature-preview preview-performance" role="img" aria-label="Crisp illustration of position tracking and a market chart">
+    <div className="preview-bar"><strong>Position overview</strong><span className="preview-label">PAPER</span></div>
+    <div className="preview-chart-heading"><span>Market movement</span><span>Long / Short</span></div>
+    <svg viewBox="0 0 440 150" preserveAspectRatio="none" aria-hidden="true">
+      <defs><linearGradient id="preview-profit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#baf37b" stopOpacity=".27"/><stop offset="100%" stopColor="#baf37b" stopOpacity="0"/></linearGradient></defs>
+      <path d="M0 135H440 M0 90H440 M0 45H440" stroke="#293b2d" strokeWidth="1" fill="none"/>
+      <path d="M0 130 L30 112 L57 118 L83 85 L108 96 L138 74 L164 90 L188 61 L216 80 L246 44 L275 57 L310 25 L335 49 L366 30 L402 41 L440 12 L440 150 L0 150Z" fill="url(#preview-profit)"/>
+      <path d="M0 130 L30 112 L57 118 L83 85 L108 96 L138 74 L164 90 L188 61 L216 80 L246 44 L275 57 L310 25 L335 49 L366 30 L402 41 L440 12" stroke="#baf37b" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+    </svg>
+    <div className="preview-chart-foot"><span><span className="preview-dot"/> Market price</span><strong>Track your paper P&L</strong></div>
+ </div>;
+}
+
 export default function Home(){
  return <main className="landing gravity-landing">
   <div className="landing-bg" aria-hidden="true"/>
@@ -16,32 +44,25 @@ export default function Home(){
    <Link href="/app" className="pill pill-nav">Launch app</Link>
   </header>
   <section className="cinematic-hero" aria-labelledby="gravity-title">
-    <h1 id="gravity-title" className="cinematic-accessible-title">Long or Short Memecoins</h1>
+    <h1 id="gravity-title" className="cinematic-accessible-title">Long or Short Memecoins on Gravity</h1>
     <div className="cinematic-mobile-copy">
       <span className="cinematic-mobile-label"><span className="status-dot"/> BUILT FOR SOLANA MEMECOINS</span>
       <h2>Long or Short<br/><em>Memecoins.</em></h2>
-      <p>Explore Pump.fun tokens and simulate long or short positions using live market prices.</p>
-      <div className="cinematic-mobile-actions">
-        <Link href="/app" className="pill pill-accent">Explore tokens</Link>
-        <a href="#product" className="pill pill-outline">How it works</a>
-      </div>
+      <p>Discover Pump.fun tokens and paper-trade either direction using live market prices.</p>
     </div>
-    <div className="cinematic-artwork">
-      <img src="/gravity-cinematic-hero.webp" alt="Gravity concept art featuring glowing memecoin orbits, long or short messaging, and illustrated desktop and mobile trading interfaces" width="2180" height="851" fetchPriority="high" />
-      <div className="cinematic-actions" aria-label="Start using Gravity">
-        <Link href="/app" className="pill pill-accent">Explore tokens</Link>
-        <a href="#product" className="pill pill-outline">How it works</a>
-      </div>
-    </div>
-    <p className="cinematic-hero-disclaimer">Illustrative interface artwork · Gravity currently offers paper trading only, with virtual funds and no real orders.</p>
+    <picture className="cinematic-artwork">
+      <source media="(max-width: 760px)" srcSet="/gravity-hero-mobile.webp"/>
+      <img src="/gravity-hero-worlds.webp" alt="Illustration of Gravity: glowing planetary worlds surrounding desktop and mobile memecoin market screens" width="1983" height="709" fetchPriority="high"/>
+    </picture>
+    <p className="cinematic-hero-disclaimer">Illustrative artwork only. Gravity offers <strong>paper trading</strong> with virtual funds, not real leveraged positions or executed orders.</p>
   </section>
 
   <div className="ticker-strip" aria-label="Platform capabilities"><div className="ticker-content">PUMP.FUN TOKEN DISCOVERY <span>✳</span> SIMULATED LONGS & SHORTS <span>✳</span> LIVE MARKET PRICES <span>✳</span> CLEAR POSITION TRACKING <span>✳</span> PUMP.FUN TOKEN DISCOVERY <span>✳</span> SIMULATED LONGS & SHORTS <span>✳</span> LIVE MARKET PRICES</div></div>
   <section className="section frame gravity-features" id="product">
    <div className="section-heading"><div><span className="overline">THE PLATFORM</span><h2>Memecoins move fast.<br/><span>Stay in control.</span></h2></div><p>From discovery to a closed paper position, Gravity gives you a clear way to explore both sides of Solana's fastest-moving markets.</p></div>
-   <div className="feature-grid">{perks.map(({icon:Icon,title,body,scene,alt},index)=><article key={title} className="feature-card">
+   <div className="feature-grid">{perks.map(({icon:Icon,title,body,scene},index)=><article key={title} className="feature-card">
     <div className="card-top"><span className="feature-index">0{index+1} / {index===0?"DISCOVER":index===1?"POSITION":"TRACK"}</span><span className="feature-icon"><Icon size={24} strokeWidth={1.8}/></span></div>
-    <div className={`feature-art scene-image scene-${scene}`} role="img" aria-label={alt}/>
+    <FeaturePreview scene={scene as PreviewScene}/>
     <h3>{title}</h3><p>{body}</p>
    </article>)}</div>
   </section>
