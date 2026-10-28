@@ -26,10 +26,10 @@ function FeaturePreview({scene}:{scene:PreviewScene}){
     <div className="preview-bar"><strong>Position overview</strong><span className="preview-label">PAPER</span></div>
     <div className="preview-chart-heading"><span>Market movement</span><span>Long / Short</span></div>
     <svg viewBox="0 0 440 150" preserveAspectRatio="none" aria-hidden="true">
-      <defs><linearGradient id="preview-profit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#baf37b" stopOpacity=".27"/><stop offset="100%" stopColor="#baf37b" stopOpacity="0"/></linearGradient></defs>
-      <path d="M0 135H440 M0 90H440 M0 45H440" stroke="#293b2d" strokeWidth="1" fill="none"/>
+      <defs><linearGradient id="preview-profit" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#7dbbf1" stopOpacity=".27"/><stop offset="100%" stopColor="#7dbbf1" stopOpacity="0"/></linearGradient></defs>
+      <path d="M0 135H440 M0 90H440 M0 45H440" stroke="#27313d" strokeWidth="1" fill="none"/>
       <path d="M0 130 L30 112 L57 118 L83 85 L108 96 L138 74 L164 90 L188 61 L216 80 L246 44 L275 57 L310 25 L335 49 L366 30 L402 41 L440 12 L440 150 L0 150Z" fill="url(#preview-profit)"/>
-      <path d="M0 130 L30 112 L57 118 L83 85 L108 96 L138 74 L164 90 L188 61 L216 80 L246 44 L275 57 L310 25 L335 49 L366 30 L402 41 L440 12" stroke="#baf37b" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
+      <path d="M0 130 L30 112 L57 118 L83 85 L108 96 L138 74 L164 90 L188 61 L216 80 L246 44 L275 57 L310 25 L335 49 L366 30 L402 41 L440 12" stroke="#7dbbf1" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" fill="none"/>
     </svg>
     <div className="preview-chart-foot"><span><span className="preview-dot"/> Market price</span><strong>Track your paper P&L</strong></div>
  </div>;

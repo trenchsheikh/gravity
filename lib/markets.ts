@@ -12,7 +12,7 @@ export type Market = {
   dex: string;
   createdAt: number | null;
   url: string;
-  source: "pump" | "gecko" | "dex";
+  source: "pump" | "gecko" | "dex" | "jupiter";
 };
 
 export const isMint = (value: string) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value.trim());
@@ -93,4 +93,31 @@ export function uniqueMarkets(markets: Market[]): Market[] {
     if (!old || ((m.priceUsd !== null ? 4 : 0) + (m.liquidityUsd || 0)/100000) > ((old.priceUsd !== null ? 4 : 0) + (old.liquidityUsd || 0)/100000)) map.set(m.mint, m);
   }
   return [...map.values()];
+}
+
+export function fromJupiter(item: Record<string, unknown>): Market | null {
+  const mint = typeof item.id === "string" ? item.id : "";
+  if (!isMint(mint)) return null;
+  const stats = item.stats24h && typeof item.stats24h === "object"
+    ? item.stats24h as Record<string,unknown> : {};
+  const firstPool = item.firstPool && typeof item.firstPool === "object"
+    ? item.firstPool as Record<string,unknown> : {};
+  const volumeA = numeric(stats.buyVolume), volumeB = numeric(stats.sellVolume);
+  const createdAt = typeof firstPool.createdAt === "string" ? Date.parse(firstPool.createdAt) : NaN;
+  return {
+    mint,
+    name: String(item.name || shorten(mint)).slice(0,80),
+    symbol: String(item.symbol || "???").slice(0,20),
+    image: isSafeImage(item.icon) ? item.icon : null,
+    priceUsd: numeric(item.usdPrice),
+    change24h: numeric(stats.priceChange),
+    marketCap: numeric(item.mcap) ?? numeric(item.fdv),
+    volume24h: volumeA !== null || volumeB !== null ? (volumeA || 0) + (volumeB || 0) : null,
+    liquidityUsd: numeric(item.liquidity),
+    poolAddress: typeof firstPool.id === "string" && isMint(firstPool.id) ? firstPool.id : null,
+    dex: "Jupiter",
+    createdAt: Number.isFinite(createdAt) ? createdAt : null,
+    url: `https://pump.fun/coin/${mint}`,
+    source: "jupiter"
+  };
 }
