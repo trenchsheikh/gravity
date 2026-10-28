@@ -1289,3 +1289,35 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
  }
  .axiom-terminal .gravity-compact-market .gravity-detail-sidebar .input-title{font-size:12px}
 }
+
+
+/* Full-resolution, transparent vector chart: no device crop, hue-rotate or bitmap scaling. */
+.gravity-landing .simple-device-stage.gravity-chart-stage{
+ width:min(1240px,92vw);
+ max-width:1240px;
+ margin:12px auto 0;
+ overflow:visible;
+ position:relative;
+}
+.gravity-landing .simple-device-stage.gravity-chart-stage img{
+ width:100%;
+ height:auto;
+ display:block;
+ max-width:100%;
+ object-fit:contain;
+ position:static;
+ left:auto;
+ transform:none;
+ filter:drop-shadow(0 13px 28px rgba(7,33,90,.26));
+}
+@media(max-width:760px){
+ .gravity-landing .simple-device-stage.gravity-chart-stage{
+  width:100%;
+  padding-inline:4px;
+  margin-top:20px;
+  overflow:visible;
+ }
+ .gravity-landing .simple-device-stage.gravity-chart-stage img{
+  width:100%;max-width:100%;left:auto;transform:none;
+ }
+}

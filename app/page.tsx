@@ -47,10 +47,10 @@ export default function Home(){
     <p>Explore Pump.fun tokens and simulate leveraged trades in either direction. Up or down.</p>
     <span className="simple-hero-disclaimer"><ShieldCheck size={16} aria-hidden="true"/> Paper trading with virtual funds · No real orders</span>
    </div>
-   <div className="simple-device-stage">
-    <img src="/gravity-hero-devices-clean.webp" width="1708" height="921" alt="Gravity laptop and iPhone trading app concepts showing token markets, price charts and simulated long and short controls" fetchPriority="high" decoding="async"/>
+   <div className="simple-device-stage gravity-chart-stage">
+    <img src="/gravity-chart-hero.svg" width="1800" height="700" alt="Gravity chart with glowing blue price movements and green Long and red Short signals" fetchPriority="high" decoding="async"/>
    </div>
-   <p className="simple-hero-footnote">Illustrative screen design. Gravity currently offers simulated trading, not real leveraged positions.</p>
+   <p className="simple-hero-footnote">Illustrative long and short signals. Gravity currently offers simulated trading, not real leveraged positions.</p>
   </section>
   <section className="section frame gravity-features" id="product">
    <div className="section-heading"><div><span className="overline">THE PLATFORM</span><h2>Memecoins move fast.<br/><span>Stay in control.</span></h2></div><p>From discovery to a closed paper position, Gravity gives you a clear way to explore both sides of Solana's fastest-moving markets.</p></div>
