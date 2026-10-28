@@ -18,33 +18,29 @@ function dollar(n:number|null|undefined,compact=false){
 }
 function change(n:number|null|undefined){return n==null ? "—" : `${n>0?"+":""}${n.toFixed(2)}%`}
 function relative(t:number|null){if(!t)return "—";let ms=Date.now()-t;if(ms<0)return "just now";if(ms<3600000)return `${Math.floor(ms/60000)}m`;if(ms<86400000)return `${Math.floor(ms/3600000)}h`;return `${Math.floor(ms/86400000)}d`}
-const alternateLogoCache=new Map<string,string|null>();
-const alternateLogoRequests=new Map<string,Promise<string|null>>();
-async function getAlternateLogo(mint:string):Promise<string|null>{
-  if(alternateLogoCache.has(mint))return alternateLogoCache.get(mint)??null;
-  const pending=alternateLogoRequests.get(mint);
-  if(pending)return pending;
-  const request=fetch("/api/token-logo?mint="+encodeURIComponent(mint))
-    .then(r=>r.ok?r.json():null)
-    .then(data=>{const icon=typeof data?.icon==="string"&&/^https:\/\//.test(data.icon)?data.icon:null;alternateLogoCache.set(mint,icon);return icon})
-    .catch(()=>{alternateLogoCache.set(mint,null);return null})
-    .finally(()=>alternateLogoRequests.delete(mint));
-  alternateLogoRequests.set(mint,request);return request;
-}
+// Cache broken original URLs so refreshes never restart the same failed image.
+const failedTokenImages=new Set<string>();
+const logoFallbacks=new Map<string,string>();
 function TokenIcon({market,size=37}:{market:Pick<Market,"mint"|"image"|"symbol">,size?:number}){
-  const [image,setImage]=useState<string|null>(market.image);
-  const [triedAlternate,setTriedAlternate]=useState(false);
-  useEffect(()=>{setImage(market.image);setTriedAlternate(false)},[market.mint,market.image]);
-  useEffect(()=>{
-    if(image||triedAlternate)return;
-    let active=true;setTriedAlternate(true);
-    void getAlternateLogo(market.mint).then(icon=>{if(active&&icon)setImage(icon)});
-    return()=>{active=false};
-  },[image,triedAlternate,market.mint]);
-  const letters=(market.symbol||"?").replace(/[^A-Za-z0-9]/g,"").slice(0,2).toUpperCase()||"?";
-  const hue=Array.from(market.mint).reduce((n,ch)=>(n*31+ch.charCodeAt(0))%360,0);
-  return <span className="token-icon gravity-token-avatar" style={{width:size,height:size,background:`linear-gradient(135deg,hsl(${hue} 41% 27%),hsl(${(hue+34)%360} 54% 18%))`}}>
-    {image?<img key={image} src={image} alt={market.symbol+" token logo"} loading="lazy" decoding="async" onError={()=>setImage(null)}/>:<span aria-label={"Logo unavailable for "+market.symbol}>{letters}</span>}
+  const mint=market.mint;
+  const direct=market.image&&market.image.startsWith("https://")?market.image:null;
+  const proxy="/api/token-image?mint="+encodeURIComponent(mint)+(direct?"&src="+encodeURIComponent(direct):"");
+  const [broken,setBroken]=useState<Set<string>>(()=>new Set());
+  const [rendered,setRendered]=useState<string|null>(null);
+  const hue=Array.from(mint).reduce((sum,ch)=>(sum*31+ch.charCodeAt(0))%360,0);
+  const initials=(market.symbol||"?").replace(/[^A-Za-z0-9]/g,"").slice(0,2).toUpperCase()||"?";
+  const candidate=direct&&!failedTokenImages.has(direct)&&!broken.has(direct)?direct:proxy;
+  const display=logoFallbacks.has(mint)?null:candidate;
+  return <span className="token-icon gravity-token-avatar" style={{width:size,height:size,background:`linear-gradient(135deg,hsl(${hue} 40% 28%),hsl(${(hue+35)%360} 48% 17%))`}}>
+    <span className="gravity-token-letters" aria-hidden="true">{initials}</span>
+    {display?<img key={display} src={display} alt={market.symbol+" logo"} loading="eager" decoding="async"
+      style={{opacity:rendered===display?1:0}}
+      onLoad={()=>setRendered(display)}
+      onError={()=>{
+        if(display===direct){failedTokenImages.add(display);setBroken(previous=>new Set(previous).add(display));}
+        else{logoFallbacks.set(mint,initials);setBroken(previous=>new Set(previous).add(proxy));}
+        setRendered(null);
+      }}/>:null}
   </span>;
 }
 function PriceChart({candles,loading,empty}: {candles:Candle[];loading:boolean;empty:string}){
@@ -336,7 +332,7 @@ export default function Terminal(){
       </div>
       <aside className="gravity-detail-sidebar">
         <div className="gravity-sidebar-token"><TokenIcon market={selected} size={30}/><div><strong>{selected.symbol} / USDC</strong><span>Simulated trading</span></div></div>
-        <div className="order-panel"><div className="order-title"><strong>Simulated trade</strong><span>SIMULATED</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Paper collateral</span><span>AVAILABLE {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open paper positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open paper ${side}`:"Live price / collateral required"}</button><p className="order-disclaimer"><ShieldCheck size={15}/> Paper trades only. No custody, transactions, or real shorts. Prices may be delayed; no automatic liquidation engine.</p></div>
+        <div className="order-panel"><div className="order-title"><strong>Simulated trade</strong><span>SIMULATED</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Paper collateral</span><span>Available {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open paper positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open paper ${side}`:"Live price / collateral required"}</button></div>
         <p className="gravity-compact-risk">Paper positions use virtual funds only. No live orders or real liquidations.</p>
       </aside>
     </div>
