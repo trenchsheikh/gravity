@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isMint } from "@/lib/markets";
 export const runtime="nodejs";
-const fetchTimeout=6000;
+const safe=(url:unknown):string|null=>typeof url==="string"&&url.length<1800&&url.startsWith("https://")?url:null;
 export async function GET(req:NextRequest){
   const mint=(req.nextUrl.searchParams.get("mint")||"").trim();
   if(!isMint(mint))return NextResponse.json({icon:null,error:"Invalid mint"},{status:400});
-  try{
-    const res=await fetch("https://tokens.jup.ag/token/"+encodeURIComponent(mint),{
-      headers:{Accept:"application/json"},next:{revalidate:86400},signal:AbortSignal.timeout(fetchTimeout)
-    });
-    if(!res.ok)return NextResponse.json({icon:null},{headers:{"Cache-Control":"public, s-maxage=600"}});
-    const data=await res.json() as Record<string,unknown>;
-    const candidate=typeof data.logoURI==="string"?data.logoURI:typeof data.icon==="string"?data.icon:null;
-    const valid=candidate&&/^https:\/\//.test(candidate)&&candidate.length<1800?candidate:null;
-    return NextResponse.json({icon:valid},{headers:{"Cache-Control":"public, s-maxage=86400, stale-while-revalidate=86400"}});
-  }catch{return NextResponse.json({icon:null},{headers:{"Cache-Control":"public, s-maxage=300"}})}
+  // Prefer the current Jupiter metadata endpoint; only fall back to its historical registry.
+  const providers=[
+    {url:"https://api.jup.ag/tokens/v2/search?query="+encodeURIComponent(mint),headers:process.env.JUPITER_API_KEY?{"x-api-key":process.env.JUPITER_API_KEY}:{}},
+    {url:"https://tokens.jup.ag/token/"+encodeURIComponent(mint),headers:{}}
+  ];
+  for(const provider of providers){
+    try{
+      const res=await fetch(provider.url,{headers:{"Accept":"application/json",...provider.headers},
+        next:{revalidate:3600},signal:AbortSignal.timeout(5500)});
+      if(!res.ok)continue;
+      const data:unknown=await res.json();
+      const item=Array.isArray(data)?data.find(x=>x&&typeof x==="object"&&x.id===mint):data;
+      if(!item||typeof item!=="object")continue;
+      const obj=item as Record<string,unknown>;
+      const icon=safe(obj.icon)||safe(obj.logoURI);
+      if(icon)return NextResponse.json({icon},{headers:{"Cache-Control":"public, s-maxage=3600, stale-while-revalidate=86400"}});
+    }catch{}
+  }
+  return NextResponse.json({icon:null},{headers:{"Cache-Control":"public, s-maxage=600"}});
 }
