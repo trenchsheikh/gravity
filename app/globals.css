@@ -1321,3 +1321,24 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
   width:100%;max-width:100%;left:auto;transform:none;
  }
 }
+
+/* Preserve exact uploaded chart colors and transparency without clipping. */
+.gravity-landing .simple-device-stage.gravity-chart-stage{
+ width:min(1240px,94vw);
+ margin:28px auto 0;
+ overflow:visible;
+ line-height:0;
+}
+.gravity-landing .simple-device-stage.gravity-chart-stage img{
+ width:100%;max-width:100%;height:auto;
+ object-fit:contain;display:block;
+ filter:none!important;transform:none!important;left:auto!important;
+}
+@media(max-width:760px){
+ .gravity-landing .simple-device-stage.gravity-chart-stage{
+  width:100%;max-width:none;overflow:visible;margin:24px auto 0;
+ }
+ .gravity-landing .simple-device-stage.gravity-chart-stage img{
+  width:100%;max-width:100%;height:auto;left:auto;transform:none!important;
+ }
+}
