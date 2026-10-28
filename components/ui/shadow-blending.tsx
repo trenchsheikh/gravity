@@ -323,7 +323,7 @@ export function ShaderBackground({ className }: { className?: string }) {
     const pendingRelease = pendingContextReleases.get(canvas)
     if (pendingRelease !== undefined) window.clearTimeout(pendingRelease)
     pendingContextReleases.delete(canvas)
-    const gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" })
+    const gl = canvas.getContext("webgl", { antialias: false, alpha: false, powerPreference: "low-power" })!
     if (!gl) return
 
     const compile = (type: number, src: string) => {
