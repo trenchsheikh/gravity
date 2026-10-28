@@ -39,58 +39,18 @@ export default function Home(){
  return <main className="landing gravity-landing">
   <div className="landing-bg" aria-hidden="true"/>
   <MarketingHeader/>
-  <section className="orbital-hero" aria-labelledby="gravity-title">
-   <div className="orbital-atmosphere" aria-hidden="true">
-    <span className="orbital-world orbital-world-left"/><span className="orbital-world orbital-world-right"/>
-    <span className="orbital-ribbon orbital-ribbon-one"/><span className="orbital-ribbon orbital-ribbon-two"/>
-   </div>
-   <div className="orbital-copy">
-    <span className="orbital-eyebrow"><span className="status-dot"/> SOLANA MEMECOINS / PAPER TRADING</span>
+  <section className="simple-hero" aria-labelledby="gravity-title">
+   <div className="simple-hero-copy">
+    <span className="simple-hero-eyebrow"><span className="status-dot"/> SOLANA MEMECOINS · PAPER TRADING</span>
     <h1 id="gravity-title">Long or short<br/><em>memecoins.</em></h1>
-    <p>Discover Pump.fun tokens. Pick a direction. Track simulated positions against real market prices.</p>
-    <span className="orbital-disclosure"><ShieldCheck size={16}/> Virtual funds only · No real orders</span>
+    <p>Discover Pump.fun tokens and simulate both sides of the market with live price data. All in one clean terminal.</p>
+    <span className="simple-hero-disclaimer"><ShieldCheck size={16} aria-hidden="true"/> Paper trading with virtual funds · No real orders</span>
    </div>
-   <div className="orbital-stage" aria-label="Illustrative preview of the Gravity trading terminal">
-    <div className="orbit-display">
-     <div className="orbit-display-top"><span className="orbit-display-mark"><span className="status-dot"/> GRAVITY / MARKETS</span><span className="orbit-mock-search"><Search size={15}/> Search a memecoin or mint address</span><span className="orbit-demo-pill">PREVIEW</span></div>
-     <div className="orbit-display-body">
-      <div className="orbit-demo-list">
-       <div className="orbit-demo-tab"><strong>Explore</strong><span>New</span><span>Watchlist</span></div>
-       {[
-        {symbol:"MOON",name:"Sample token",color:"orb-avatar-1",change:"+18.6%"},
-        {symbol:"PUMP",name:"Market example",color:"orb-avatar-2",change:"+4.2%"},
-        {symbol:"WAVE",name:"Sample market",color:"orb-avatar-3",change:"−7.5%"},
-        {symbol:"GOAT",name:"Token example",color:"orb-avatar-4",change:"+12.8%"}
-       ].map((t,i)=><div className="orbit-demo-token" key={t.symbol}><span className={`orbit-token-avatar ${t.color}`}>{t.symbol[0]}</span><span className="orbit-token-name"><strong>{t.symbol}</strong><small>{t.name}</small></span><span className={`orbit-token-change ${i===2?"negative":""}`}>{t.change}</span></div>)}
-      </div>
-      <div className="orbit-demo-chart">
-       <div className="orbit-chart-top"><span><strong>Sample market</strong><small>Illustrative price chart</small></span><span className="orbit-chart-gain">+18.6%</span></div>
-       <div className="orbit-chart-price">$0.00412</div>
-       <svg viewBox="0 0 600 240" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="orbit-chart-fill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="#c4fc86" stopOpacity=".31"/><stop offset="1" stopColor="#c4fc86" stopOpacity="0"/></linearGradient></defs><path d="M0 56H600M0 114H600M0 174H600M100 0V240M220 0V240M340 0V240M460 0V240" stroke="#a5d483" strokeOpacity=".12" strokeWidth="1" fill="none"/><path d="M0 193 L26 189 L52 180 L75 188 L99 151 L124 165 L146 130 L174 146 L193 125 L211 130 L231 95 L249 104 L269 132 L289 108 L314 116 L332 87 L356 72 L376 92 L395 63 L417 71 L439 45 L461 56 L486 34 L512 51 L531 28 L556 38 L580 15 L600 25 L600 240 L0 240Z" fill="url(#orbit-chart-fill)"/><path d="M0 193 L26 189 L52 180 L75 188 L99 151 L124 165 L146 130 L174 146 L193 125 L211 130 L231 95 L249 104 L269 132 L289 108 L314 116 L332 87 L356 72 L376 92 L395 63 L417 71 L439 45 L461 56 L486 34 L512 51 L531 28 L556 38 L580 15 L600 25" fill="none" stroke="#c4fc86" strokeWidth="4" strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke"/></svg>
-       <div className="orbit-chart-bottom"><span>1H</span><span>4H</span><span>1D</span><span>DEMO CHART</span></div>
-      </div>
-      <div className="orbit-demo-order">
-       <span className="orbit-ticket-title">Paper trade</span>
-       <div className="orbit-demo-sides"><strong>Long</strong><span>Short</span></div>
-       <label>Virtual collateral <span>USDC</span></label>
-       <div className="orbit-demo-amount">100.00 <small>USDC</small></div>
-       <label>Simulated leverage</label>
-       <div className="orbit-demo-leverage"><span>1×</span><strong>2×</strong><span>3×</span></div>
-       <div className="orbit-demo-open">Simulate long</div>
-       <small className="orbit-demo-foot">No real orders or funds</small>
-      </div>
-     </div>
-    </div>
-    <div className="orbit-phone" aria-hidden="true">
-      <div className="orbit-phone-dots"/><span className="orbit-phone-brand">gravity<span>.</span></span>
-      <small>Paper trading</small><strong>Sample market</strong><div className="orbit-phone-price">$0.00412 <span>+18.6%</span></div>
-      <svg viewBox="0 0 200 82" preserveAspectRatio="none"><path d="M0 70 L18 59 L35 65 L50 42 L67 51 L83 29 L99 41 L112 25 L129 33 L146 12 L160 20 L177 8 L200 14" fill="none" stroke="#bdfb80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
-      <div className="orbit-phone-directions"><b>Long</b><span>Short</span></div><div className="orbit-phone-bottom">100 virtual USDC</div>
-    </div>
+   <div className="simple-device-stage">
+    <img src="/gravity-laptop-phone.webp" width="1568" height="789" alt="Gravity laptop and iPhone trading app concepts showing token markets, price charts and simulated long and short controls" fetchPriority="high" decoding="async"/>
    </div>
-   <p className="orbital-footnote">Illustrative interface preview. Gravity currently supports simulated longs and shorts, not live derivatives.</p>
+   <p className="simple-hero-footnote">Illustrative screen design. Gravity currently offers simulated trading, not real leveraged positions.</p>
   </section>
-
   <section className="section frame gravity-features" id="product">
    <div className="section-heading"><div><span className="overline">THE PLATFORM</span><h2>Memecoins move fast.<br/><span>Stay in control.</span></h2></div><p>From discovery to a closed paper position, Gravity gives you a clear way to explore both sides of Solana's fastest-moving markets.</p></div>
    <div className="feature-grid">{perks.map(({icon:Icon,title,body,scene},index)=><article key={title} className="feature-card">
