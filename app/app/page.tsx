@@ -2,12 +2,18 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+import type {OhlcvCandle} from "@/components/MarketCandlestickChart";
+const MarketCandlestickChart=dynamic(()=>import("@/components/MarketCandlestickChart"),{ssr:false});
 import { Activity, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Clock3, Compass, ExternalLink, LoaderCircle, Menu, RefreshCw, Search, ShieldCheck, Star, TrendingDown, TrendingUp, Wallet, X } from "lucide-react";
 import Brand from "@/components/Brand";
 import type { Market } from "@/lib/markets";
 import { closePosition, freeBalance, getPnl, getPositions, lockedMargin, newPosition, Position, realisedPnl, STARTING_BALANCE, storePositions } from "@/lib/paper";
 
-type Candle = {time:number;close:number};
+type Candle=OhlcvCandle;
+type ChartInterval="1m"|"5m"|"15m"|"1H"|"4H"|"1D";
+const INTERVALS:ChartInterval[]=["1m","5m","15m","1H","4H","1D"];
+const candleCache=new Map<string,{candles:Candle[];source:string;updated:number}>();
 function dollar(n:number|null|undefined,compact=false){
   if(n==null || !Number.isFinite(n)) return "—";
   if(compact) return "$"+new Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:1}).format(n);
@@ -43,14 +49,10 @@ function TokenIcon({market,size=37}:{market:Pick<Market,"mint"|"image"|"symbol">
       }}/>:null}
   </span>;
 }
-function PriceChart({candles,loading,empty}: {candles:Candle[];loading:boolean;empty:string}){
-  if(loading)return <div className="chart-empty"><LoaderCircle className="spin" size={24}/><span>Loading market history</span></div>;
-  if(candles.length<3)return <div className="chart-empty"><Activity size={25}/><span>{empty}</span><small>No chart data is fabricated.</small></div>;
-  const vals=candles.map(c=>c.close);const min=Math.min(...vals),max=Math.max(...vals);const span=max-min||1;
-  const pts=vals.map((n,i)=>`${(i/(vals.length-1)*1000).toFixed(2)},${(230-(n-min)/span*190).toFixed(2)}`).join(" ");
-  const area=`0,250 ${pts} 1000,250`;
-  const up=vals.at(-1)!>=vals[0];
-  return <div className="chart-live"><div className="chart-grid"/><svg viewBox="0 0 1000 250" preserveAspectRatio="none" aria-label="Historical price chart sourced from GeckoTerminal" role="img"><defs><linearGradient id="chartfill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor={up?"#70b3ed":"#ff716f"} stopOpacity=".20"/><stop offset="1" stopColor={up?"#70b3ed":"#ff716f"} stopOpacity="0"/></linearGradient></defs><polygon points={area} fill="url(#chartfill)"/><polyline points={pts} fill="none" stroke={up?"#70b3ed":"#ff716f"} strokeWidth="2.3" vectorEffect="non-scaling-stroke" strokeLinecap="round" strokeLinejoin="round"/></svg><div className="chart-ticks"><span>OLDER</span><span>5 MIN CANDLES · GECKOTERMINAL</span><span>NOW</span></div></div>
+function PriceChart({candles,loading,empty,source}: {candles:Candle[];loading:boolean;empty:string;source:string}){
+  if(loading&&!candles.length)return <div className="chart-empty"><LoaderCircle className="spin" size={23}/><span>Loading real market candles</span></div>;
+  if(!candles.length)return <div className="chart-empty"><Activity size={22}/><span>{empty||"No recorded market candles are available yet."}</span><small>Only real market data is displayed. Try another interval or token.</small></div>;
+  return <div className="chart-live gravity-interactive-chart"><MarketCandlestickChart candles={candles}/>{loading&&<span className="gravity-chart-refresh"><LoaderCircle className="spin" size={12}/> Updating</span>}<span className="gravity-chart-provider">{source}</span></div>;
 }
 
 function SolanaGlyph({size=19}:{size?:number}){
@@ -89,6 +91,8 @@ export default function Terminal(){
   const [prices,setPrices]=useState<Record<string,number>>({});
   const [toast,setToast]=useState("");
   const [candles,setCandles]=useState<Candle[]>([]);
+  const [chartInterval,setChartInterval]=useState<ChartInterval>("1m");
+  const [chartSource,setChartSource]=useState("");
   const [candlesLoading,setCandlesLoading]=useState(false);
   const [chartMessage,setChartMessage]=useState("Historical market data isn't available for this token yet.");
   const [processing,setProcessing]=useState(false);
@@ -149,10 +153,53 @@ export default function Terminal(){
   useEffect(()=>{const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query?450:0);return()=>{clearTimeout(timeout);c.abort()}},[fetchMarkets,tick]);
   useEffect(()=>{if(!pageVisible)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible]);
   useEffect(()=>{if(pageVisible)setTick(x=>x+1)},[pageVisible]);
-  useEffect(()=>{if(!selected?.mint){setCandles([]);setChartMessage("Historical market data isn't available for this token yet.");return}
-    const c=new AbortController();setCandlesLoading(true);setCandles([]);fetch(`/api/candles?mint=${encodeURIComponent(selected.mint)}`,{signal:c.signal}).then(r=>r.json()).then(d=>{if(!c.signal.aborted){setCandles(d.candles||[]);setChartMessage(d.error||"No historical candles found for this pool.")}}).catch(()=>{if(!c.signal.aborted)setChartMessage("The chart provider is unavailable.")}).finally(()=>{if(!c.signal.aborted)setCandlesLoading(false)});
-    return()=>c.abort();
-  },[selected?.mint]);
+  useEffect(()=>{
+    if(!tradeOpen||!selected?.mint||!pageVisible)return;
+    const mint=selected.mint;
+    const key=mint+":"+chartInterval;
+    let active=true;
+    let controller:AbortController|null=null;
+    const prev=candleCache.get(key);
+    if(prev?.candles.length){
+      setCandles(prev.candles);
+      setChartSource(prev.source);
+      setCandlesLoading(false);
+    }else{
+      setCandles([]);
+      setChartSource("");
+      setCandlesLoading(true);
+    }
+    setChartMessage("Waiting for the token's real market history.");
+    const update=async()=>{
+      controller?.abort();
+      const request=new AbortController();controller=request;
+      if(!candleCache.has(key))setCandlesLoading(true);
+      try{
+        const r=await fetch("/api/candles?mint="+encodeURIComponent(mint)+"&interval="+encodeURIComponent(chartInterval),{
+          signal:request.signal,cache:"no-store"
+        });
+        const response=await r.json();
+        if(!r.ok)throw Error(response.error||"Chart provider unavailable");
+        const records=(Array.isArray(response.candles)?response.candles:[]) as Candle[];
+        const clean=records.filter(c=>Number.isFinite(c.time)&&c.open>0&&c.high>0&&c.low>0&&c.close>0)
+          .sort((a,b)=>a.time-b.time);
+        if(!active||request.signal.aborted)return;
+        if(clean.length){
+          candleCache.set(key,{candles:clean,source:response.source||"Market data",updated:Date.now()});
+          setCandles(clean);setChartSource(response.source||"Market data");
+        }else{
+          if(!candleCache.has(key)){setCandles([]);setChartSource("");}
+          setChartMessage(response.error||"No historical trades recorded by the chart providers for this timeframe.");
+        }
+      }catch(error){
+        if(!active||request.signal.aborted)return;
+        setChartMessage(error instanceof Error?error.message:"Historical market data could not be loaded");
+      }finally{if(active&&!request.signal.aborted)setCandlesLoading(false)}
+    };
+    void update();
+    const timer=setInterval(update,15000);
+    return()=>{active=false;controller?.abort();clearInterval(timer)};
+  },[tradeOpen,selected?.mint,chartInterval,pageVisible]);
   useEffect(()=>{
     const mints=[...new Set(positions.filter(p=>!p.closedAt).map(p=>p.mint))].slice(0,10);
     if(!mints.length)return;
@@ -301,7 +348,7 @@ export default function Terminal(){
           <div className="gravity-detail-names"><span className="gravity-detail-category">Solana · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
           <div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div>
         </div>
-        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><strong>Price chart</strong><span>5m candles · GeckoTerminal</span></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage}/></div>
+        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Real OHLCV · {chartSource||"Birdeye"}</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage} source={chartSource}/></div>
         <div className="gravity-compact-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} 24h volume</span><span>{selectedLastUpdated?"Updated "+new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting for market quote"}</span></div>
         <div className="gravity-inline-metrics">
           <div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div>
