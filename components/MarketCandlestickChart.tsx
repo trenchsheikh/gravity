@@ -39,7 +39,7 @@ export default function MarketCandlestickChart({candles}:{candles:OhlcvCandle[]}
     });
     const series=chart.addSeries(CandlestickSeries,{
       upColor:"#17d4aa",downColor:"#ff5978",borderVisible:false,wickUpColor:"#49e4c1",wickDownColor:"#ff7991",
-      priceFormat:{type:"price",precision:8,minMove:0.00000001},
+      priceFormat:{type:"custom",formatter:formatPrice,minMove:0.000000000001},
       lastValueVisible:true,priceLineVisible:true
     });
     const volume=chart.addSeries(HistogramSeries,{

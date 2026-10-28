@@ -52,11 +52,11 @@ function normalize(items: unknown): PriceCandle[] {
   }
   return [...sorted.values()].sort((a,b)=>a.time-b.time);
 }
-async function apiJson(url:string,headers:Record<string,string>):Promise<UnknownRecord> {
+async function apiJson(url:string,headers:Record<string,string>,timeout=4500):Promise<UnknownRecord> {
   const response=await fetch(url,{
     headers:{Accept:"application/json",...headers},
     next:{revalidate:10},
-    signal:AbortSignal.timeout(6500)
+    signal:AbortSignal.timeout(timeout)
   });
   if(!response.ok) throw new Error("HTTP "+response.status);
   const body:unknown=await response.json();
@@ -84,7 +84,7 @@ async function birdeye(mint:string,interval:Interval):Promise<PriceCandle[]> {
   // Birdeye older endpoint can cover tokens unavailable from the V3 plan.
   try {
     const legacy=new URLSearchParams({address:mint,type,time_from:String(from),time_to:String(now+seconds)});
-    const v1=await apiJson("https://public-api.birdeye.so/defi/ohlcv?"+legacy,headers);
+    const v1=await apiJson("https://public-api.birdeye.so/defi/ohlcv?"+legacy,headers,2500);
     return normalize((v1.data as UnknownRecord|undefined)?.items).slice(-500);
   } catch {return []}
 }
@@ -92,14 +92,14 @@ async function gecko(mint:string,interval:Interval):Promise<PriceCandle[]> {
   const settings=OPTIONS[interval];
   const pools=await apiJson(
     "https://api.geckoterminal.com/api/v2/networks/solana/tokens/"+encodeURIComponent(mint)+"/pools?page=1",
-    {}
+    {},3500
   );
   const candidates=Array.isArray(pools.data)?pools.data:[];
   const sorted=[...candidates].filter(x=>x&&typeof x==="object").sort((a,b)=>{
     const first=(a as UnknownRecord).attributes as UnknownRecord|undefined;
     const second=(b as UnknownRecord).attributes as UnknownRecord|undefined;
     return (number(second?.reserve_in_usd)||0)-(number(first?.reserve_in_usd)||0);
-  }).slice(0,3);
+  }).slice(0,2);
   for(const candidate of sorted) {
     const record=candidate as UnknownRecord;
     const attrs=record.attributes as UnknownRecord|undefined;
@@ -113,7 +113,7 @@ async function gecko(mint:string,interval:Interval):Promise<PriceCandle[]> {
       });
       const result=await apiJson(
         "https://api.geckoterminal.com/api/v2/networks/solana/pools/"+encodeURIComponent(pool)+"/ohlcv/"+settings.gecko+"?"+params,
-        {}
+        {},3500
       );
       const raw=(result.data as UnknownRecord|undefined)?.attributes as UnknownRecord|undefined;
       const candles=normalize(raw?.ohlcv_list);
