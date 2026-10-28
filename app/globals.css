@@ -1091,3 +1091,133 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
  .gravity-detail-position{grid-template-columns:1fr 1fr}
  .gravity-detail-sidebar .order-panel{padding:15px 0 8px}
 }
+
+
+/* Gravity compact token workspace — neutral navy surfaces, clean dividers and no metric cards. */
+.axiom-terminal:has(.gravity-compact-market){background:#080b13}
+.axiom-terminal .gravity-compact-market{color:#edf3ff;padding:7px 0 0;min-width:0}
+.axiom-terminal .gravity-compact-market .gravity-detail-navigation{min-height:38px;padding:0 0 9px;border-color:#233148}
+.axiom-terminal .gravity-compact-market .gravity-detail-navigation>button{font-size:12px;min-height:32px}
+.axiom-terminal .gravity-compact-nav-right{gap:12px}
+.axiom-terminal .gravity-compact-market .gravity-detail-grid{grid-template-columns:minmax(0,1fr) 307px;gap:19px;padding:12px 0 0}
+.axiom-terminal .gravity-compact-market .gravity-detail-primary{min-width:0}
+.axiom-terminal .gravity-compact-market .gravity-detail-heading{gap:12px;padding:2px 0 15px}
+.axiom-terminal .gravity-compact-market .gravity-detail-category{font-size:11px;color:#92aacc}
+.axiom-terminal .gravity-compact-market .gravity-detail-heading h1{font-size:21px;font-weight:760;margin:5px 0 0;color:#f6faff}
+.axiom-terminal .gravity-compact-market .gravity-detail-heading h1 small{font-size:12px;color:#849abf}
+.axiom-terminal .gravity-compact-market .gravity-detail-price strong{font-size:24px}
+.axiom-terminal .gravity-compact-market .gravity-detail-price>span{font-size:12px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart{padding:0;min-height:0;background:#090f1c;border:1px solid #203048;border-radius:8px;display:flex;flex-direction:column}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart-top{height:37px;flex:none;background:transparent;border-bottom:1px solid #213047;padding-inline:13px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart-top strong{font-size:12px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart-top span{font-size:10px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live{position:relative;height:285px!important;min-height:0;background:#090f1c;display:flex;flex-direction:column;flex:1;overflow:hidden}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live svg{height:calc(100% - 24px)!important;min-height:0;flex:1}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-ticks{flex:none;min-height:24px;display:flex;align-items:center;color:#6f87a6;letter-spacing:.01em;font-size:9px;padding-inline:13px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-empty{height:100%!important;min-height:150px;background:#090f1c}
+.axiom-terminal .gravity-compact-market .gravity-compact-chart-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;color:#8296b5;font-size:10px}
+.axiom-terminal .gravity-compact-market .gravity-compact-chart-footer span:first-child{display:flex;align-items:center;gap:6px}
+.axiom-terminal .gravity-compact-market .gravity-compact-chart-footer svg{color:#71a9ed}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-top:1px solid #23334c;border-bottom:1px solid #23334c;padding:14px 0;background:none}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics>div{padding:0 13px;border-right:1px solid #24364e;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:6px;background:none}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:first-child{padding-left:0}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:last-child{border-right:0}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics span:not(.text-up):not(.text-down){color:#93a4bc;font-size:10px}
+.axiom-terminal .gravity-compact-market .gravity-inline-metrics strong{font-size:16px;font-weight:770;white-space:nowrap;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.axiom-terminal .gravity-compact-market .gravity-inline-slash{padding:0 2px;color:#6b809d}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabs{display:flex;gap:22px;align-items:center;height:37px;border-bottom:1px solid #253650;background:none;min-height:37px}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabs button{appearance:none;border:0;border-bottom:2px solid transparent;height:100%;padding:0 1px;background:transparent;color:#8294b1;font-size:12px;font-weight:680}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabs button:hover{color:#d2e2ff}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabs button.active{color:#a5c8ff;border-bottom-color:#5b96f2}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabs button span{padding:2px 5px;background:#1d2c45;border-radius:4px;font-size:9px}
+.axiom-terminal .gravity-compact-market .gravity-compact-tabbody{min-height:69px;max-height:120px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#394f70 #0c1523}
+.axiom-terminal .gravity-compact-market .gravity-compact-overview{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:13px 0;color:#8da1bb}
+.axiom-terminal .gravity-compact-market .gravity-compact-overview>div{display:flex;flex-direction:column;gap:4px;min-width:70px}
+.axiom-terminal .gravity-compact-market .gravity-compact-overview>div>span{font-size:10px;color:#8ba1be}
+.axiom-terminal .gravity-compact-market .gravity-compact-overview strong{font-size:12px;font-variant-numeric:tabular-nums}
+.axiom-terminal .gravity-compact-market .gravity-compact-subtitle{font-size:11px;color:#a5b7d1;font-weight:680;margin-right:8px}
+.axiom-terminal .gravity-compact-market .gravity-compact-score{display:flex;flex-direction:column;gap:5px;font-size:10px;border-left:1px solid #24364e;padding-left:15px}
+.axiom-terminal .gravity-compact-market .gravity-compact-score strong{color:#cfdeef}
+.axiom-terminal .gravity-compact-market .gravity-compact-positions{padding:9px 0;font-size:12px;color:#93a6c0}
+.axiom-terminal .gravity-compact-market .gravity-compact-position{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:9px;align-items:center;padding:8px 0;border-bottom:1px solid #203149}
+.axiom-terminal .gravity-compact-market .gravity-compact-position button{background:#182842;color:#c0d9ff;border:1px solid #34527e;border-radius:6px;padding:7px 11px;font-weight:680;font-size:11px}
+.axiom-terminal .gravity-compact-market .gravity-compact-position button:disabled{opacity:.4}
+.axiom-terminal .gravity-compact-market .gravity-compact-info{padding:11px 0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 30px}
+.axiom-terminal .gravity-compact-market .gravity-compact-info>div{display:flex;gap:10px;align-items:center;justify-content:space-between;min-width:0}
+.axiom-terminal .gravity-compact-market .gravity-compact-info>div>span{color:#8498b4;font-size:11px}
+.axiom-terminal .gravity-compact-market .gravity-compact-info strong,
+.axiom-terminal .gravity-compact-market .gravity-compact-info button{font-size:11px;font-weight:750;color:#dae8fc;border:0;background:transparent;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar{border:1px solid #283d5a;border-radius:10px;box-shadow:none;background:#0e1728;top:0;padding:0 14px 13px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#3a4c6b #0c1523}
+.axiom-terminal .gravity-compact-market .gravity-sidebar-token{padding:11px 0;border-color:#2c415d}
+.axiom-terminal .gravity-compact-market .gravity-sidebar-token strong{font-size:13px}
+.axiom-terminal .gravity-compact-market .gravity-sidebar-token span{font-size:10px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-panel{padding:9px 0 3px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-title{margin:0 0 11px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-title strong{font-size:13px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .direction-switch button{padding:10px 8px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .input-title{margin:14px 0 7px;font-size:11px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .amount-field{height:43px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .amount-field input{font-size:17px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .leverage-options button{height:35px;font-size:11px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-summary{margin-top:14px;padding-top:13px;gap:10px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-summary span{font-size:10px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-summary strong{font-size:11px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-submit{margin-top:15px;height:44px}
+.axiom-terminal .gravity-compact-market .gravity-detail-sidebar .order-disclaimer{display:none}
+.axiom-terminal .gravity-compact-market .gravity-compact-risk{font-size:10px;line-height:1.45;color:#8198b7;margin:7px 0 0;border-top:1px solid #223550;padding-top:10px}
+.axiom-terminal .gravity-token-avatar{color:#e3efff;font-size:12px;font-weight:780;border:1px solid #405370;border-radius:9px;box-shadow:inset 0 1px 0 #ffffff12}
+.axiom-terminal .gravity-token-avatar img{object-fit:cover;border-radius:inherit;display:block}
+.axiom-terminal .gravity-token-avatar>span{display:grid;place-items:center;width:100%;height:100%;color:#eef5ff;font-weight:850;letter-spacing:-.04em}
+@media(min-width:1050px) and (min-height:700px){
+ .axiom-terminal:has(.gravity-compact-market){height:100dvh;overflow:hidden;padding-bottom:32px}
+ .axiom-terminal:has(.gravity-compact-market) .axiom-main{height:calc(100dvh - 119px);min-height:0;overflow:hidden;padding-bottom:0}
+ .axiom-terminal:has(.gravity-compact-market) .axiom-workspace{height:100%;overflow:hidden}
+ .axiom-terminal .gravity-compact-market{height:100%;display:flex;flex-direction:column;overflow:hidden;padding-top:5px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-navigation{flex:none}
+ .axiom-terminal .gravity-compact-market .gravity-detail-grid{flex:1;min-height:0;overflow:hidden}
+ .axiom-terminal .gravity-compact-market .gravity-detail-primary{display:grid;grid-template-rows:auto minmax(150px,1fr) auto auto auto minmax(60px,auto);min-height:0;overflow:hidden}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart{min-height:0;height:100%}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live{height:100%!important;min-height:0}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live svg{height:0!important;flex:1 1 auto;min-height:0}
+ .axiom-terminal .gravity-compact-market .gravity-detail-sidebar{height:100%;min-height:0;position:relative;top:auto}
+ .axiom-terminal .gravity-compact-market .gravity-compact-tabbody{max-height:100%;overflow-y:auto;min-height:0}
+}
+@media(max-width:1049px){
+ .axiom-terminal .gravity-compact-market .gravity-detail-grid{grid-template-columns:minmax(0,1fr) 283px;gap:12px}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics{grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div{padding:10px 12px;border-bottom:1px solid #26364d}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(3){border-right:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(n+4){border-bottom:0}
+}
+@media(max-width:750px){
+ .axiom-terminal:has(.gravity-compact-market){height:auto;overflow:visible;padding-bottom:40px}
+ .axiom-terminal .gravity-compact-market{height:auto;overflow:visible;padding-top:6px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-grid{display:flex;flex-direction:column;gap:12px;overflow:visible;padding-top:6px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-primary{width:100%;display:flex;flex-direction:column;overflow:visible}
+ .axiom-terminal .gravity-compact-market .gravity-detail-sidebar{position:static;top:auto;width:100%;overflow:visible}
+ .axiom-terminal .gravity-compact-market .gravity-detail-heading{gap:8px;align-items:center;padding:9px 0 13px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-heading h1{font-size:18px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-price strong{font-size:19px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart{height:235px}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live{height:195px!important}
+ .axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-live svg{height:170px!important}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics{grid-template-columns:repeat(3,minmax(0,1fr));padding:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div{padding:10px 9px;border-bottom:1px solid #23344c}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:first-child{padding-left:9px}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(3){border-right:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(n+4){border-bottom:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics strong{font-size:13px}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics span:not(.text-up):not(.text-down){font-size:9px}
+ .axiom-terminal .gravity-compact-market .gravity-compact-overview{gap:12px}
+ .axiom-terminal .gravity-compact-market .gravity-compact-overview>div{min-width:55px}
+ .axiom-terminal .gravity-compact-market .gravity-compact-tabbody{max-height:none;min-height:70px}
+ .axiom-terminal .gravity-compact-market .gravity-compact-info{grid-template-columns:1fr 1fr;gap:13px}
+ .axiom-terminal .gravity-compact-market .gravity-compact-nav-right>span:first-child{display:none}
+}
+@media(max-width:390px){
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(3){border-right:1px solid #26364d}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(2n){border-right:0}
+ .axiom-terminal .gravity-compact-market .gravity-inline-metrics>div:nth-child(4){border-bottom:1px solid #26364d}
+ .axiom-terminal .gravity-compact-market .gravity-compact-info{grid-template-columns:1fr}
+}
