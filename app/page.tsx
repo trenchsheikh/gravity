@@ -27,7 +27,7 @@ export default function Home(){
       </div>
     </div>
     <div className="cinematic-artwork">
-      <img src="/gravity-cinematic-hero.webp" alt="Gravity concept art featuring glowing memecoin orbits, long or short messaging, and illustrated desktop and mobile trading interfaces" width="2180" height="721" fetchPriority="high" />
+      <img src="/gravity-cinematic-hero.webp" alt="Gravity concept art featuring glowing memecoin orbits, long or short messaging, and illustrated desktop and mobile trading interfaces" width="2180" height="851" fetchPriority="high" />
       <div className="cinematic-actions" aria-label="Start using Gravity">
         <Link href="/app" className="pill pill-accent">Explore tokens</Link>
         <a href="#product" className="pill pill-outline">How it works</a>
