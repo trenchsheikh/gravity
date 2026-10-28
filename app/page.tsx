@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {Activity, ChartNoAxesCombined, CircleCheck, Compass, Radar, Search, ShieldCheck, SlidersHorizontal, Target, TrendingDown, TrendingUp} from "lucide-react";
 import MarketingHeader from "@/components/MarketingHeader";
+import HeroArtwork from "@/components/HeroArtwork";
 import { ShaderBackground } from "@/components/ui/shadow-blending";
 
 const perks=[
@@ -48,7 +49,7 @@ export default function Home(){
     <span className="simple-hero-disclaimer"><ShieldCheck size={16} aria-hidden="true"/> Paper trading with virtual funds · No real orders</span>
    </div>
    <div className="simple-device-stage gravity-chart-stage">
-    <img src="/gravity-chart-hero.svg" width="1800" height="700" alt="Gravity chart with glowing blue price movements and green Long and red Short signals" fetchPriority="high" decoding="async"/>
+    <HeroArtwork/>
    </div>
    <p className="simple-hero-footnote">Illustrative long and short signals. Gravity currently offers simulated trading, not real leveraged positions.</p>
   </section>
