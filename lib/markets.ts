@@ -114,7 +114,7 @@ export function fromJupiter(item: Record<string, unknown>): Market | null {
     marketCap: numeric(item.mcap) ?? numeric(item.fdv),
     volume24h: volumeA !== null || volumeB !== null ? (volumeA || 0) + (volumeB || 0) : null,
     liquidityUsd: numeric(item.liquidity),
-    poolAddress: typeof firstPool.id === "string" && isMint(firstPool.id) ? firstPool.id : null,
+    poolAddress: typeof firstPool.id === "string" && isMint(firstPool.id) && firstPool.id !== mint ? firstPool.id : null,
     dex: "Jupiter",
     createdAt: Number.isFinite(createdAt) ? createdAt : null,
     url: `https://pump.fun/coin/${mint}`,
