@@ -18,9 +18,34 @@ function dollar(n:number|null|undefined,compact=false){
 }
 function change(n:number|null|undefined){return n==null ? "—" : `${n>0?"+":""}${n.toFixed(2)}%`}
 function relative(t:number|null){if(!t)return "—";let ms=Date.now()-t;if(ms<0)return "just now";if(ms<3600000)return `${Math.floor(ms/60000)}m`;if(ms<86400000)return `${Math.floor(ms/3600000)}h`;return `${Math.floor(ms/86400000)}d`}
-function TokenIcon({market,size=37}:{market:Pick<Market,"image"|"symbol">,size?:number}){
-  const [broken,setBroken]=useState(false);
-  return <span className="token-icon" style={{width:size,height:size}}>{market.image&&!broken ? <img src={market.image} alt="" onError={()=>setBroken(true)}/> : <span>{(market.symbol||"?").slice(0,2).toUpperCase()}</span>}</span>;
+const alternateLogoCache=new Map<string,string|null>();
+const alternateLogoRequests=new Map<string,Promise<string|null>>();
+async function getAlternateLogo(mint:string):Promise<string|null>{
+  if(alternateLogoCache.has(mint))return alternateLogoCache.get(mint)??null;
+  const pending=alternateLogoRequests.get(mint);
+  if(pending)return pending;
+  const request=fetch("/api/token-logo?mint="+encodeURIComponent(mint))
+    .then(r=>r.ok?r.json():null)
+    .then(data=>{const icon=typeof data?.icon==="string"&&/^https:\/\//.test(data.icon)?data.icon:null;alternateLogoCache.set(mint,icon);return icon})
+    .catch(()=>{alternateLogoCache.set(mint,null);return null})
+    .finally(()=>alternateLogoRequests.delete(mint));
+  alternateLogoRequests.set(mint,request);return request;
+}
+function TokenIcon({market,size=37}:{market:Pick<Market,"mint"|"image"|"symbol">,size?:number}){
+  const [image,setImage]=useState<string|null>(market.image);
+  const [triedAlternate,setTriedAlternate]=useState(false);
+  useEffect(()=>{setImage(market.image);setTriedAlternate(false)},[market.mint,market.image]);
+  useEffect(()=>{
+    if(image||triedAlternate)return;
+    let active=true;setTriedAlternate(true);
+    void getAlternateLogo(market.mint).then(icon=>{if(active&&icon)setImage(icon)});
+    return()=>{active=false};
+  },[image,triedAlternate,market.mint]);
+  const letters=(market.symbol||"?").replace(/[^A-Za-z0-9]/g,"").slice(0,2).toUpperCase()||"?";
+  const hue=Array.from(market.mint).reduce((n,ch)=>(n*31+ch.charCodeAt(0))%360,0);
+  return <span className="token-icon gravity-token-avatar" style={{width:size,height:size,background:`linear-gradient(135deg,hsl(${hue} 41% 27%),hsl(${(hue+34)%360} 54% 18%))`}}>
+    {image?<img key={image} src={image} alt={market.symbol+" token logo"} loading="lazy" decoding="async" onError={()=>setImage(null)}/>:<span aria-label={"Logo unavailable for "+market.symbol}>{letters}</span>}
+  </span>;
 }
 function PriceChart({candles,loading,empty}: {candles:Candle[];loading:boolean;empty:string}){
   if(loading)return <div className="chart-empty"><LoaderCircle className="spin" size={24}/><span>Loading market history</span></div>;
@@ -75,6 +100,7 @@ export default function Terminal(){
   const [mobileTrading,setMobileTrading]=useState(false);
   const [watchlist,setWatchlist]=useState<string[]>([]);
   const [watchOnly,setWatchOnly]=useState(false);
+  const [detailTab,setDetailTab]=useState<"overview"|"positions"|"info">("overview");
 
   useEffect(()=>{setPositions(getPositions());try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}
     try{const tokens=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]");if(Array.isArray(tokens))setCatalog(tokens.filter((m:Market)=>m&&typeof m.mint==="string").slice(0,280));}catch{}
@@ -167,7 +193,7 @@ export default function Terminal(){
     const sortValue=(m:Market)=>sortBy==="cap"?m.marketCap:sortBy==="liquidity"?m.liquidityUsd:sortBy==="volume"?windowVolume(m,windowSize):windowChange(m,windowSize);
     return [...list].sort((a,b)=>(sortValue(b)??Number.NEGATIVE_INFINITY)-(sortValue(a)??Number.NEGATIVE_INFINITY));
   },[markets,catalog,watchOnly,watchlist,tab,query,sortBy,windowSize]);
-  const openTrade=(m:Market)=>{setSelected(m);setSelectedLastUpdated(null);setTradeOpen(true);setMobileTrading(true);window.scrollTo({top:0,behavior:"instant"})};
+  const openTrade=(m:Market)=>{setSelected(m);setDetailTab("overview");setSelectedLastUpdated(null);setTradeOpen(true);setMobileTrading(true);window.scrollTo({top:0,behavior:"instant"})};
   const hideTrade=()=>{setTradeOpen(false);setMobileTrading(false)};
   const open=positions.filter(p=>!p.closedAt);
   const closed=positions.filter(p=>!!p.closedAt);
@@ -264,22 +290,57 @@ export default function Terminal(){
             </div>
           </div>
           </div>
-          {tradeOpen&&selected&&<section className="gravity-market-detail">
-  <div className="gravity-detail-navigation"><button onClick={hideTrade}><ArrowLeft size={16}/> All markets</button><div><span><SolanaGlyph size={17}/> Solana</span><span className="gravity-market-live"><i/> {selectedLastUpdated&&Date.now()-selectedLastUpdated<30000?"Live market":"Refreshing"}</span><button onClick={()=>toggleWatch(selected.mint)} aria-label="Toggle watchlist"><Star size={18} fill={watchlist.includes(selected.mint)?"currentColor":"none"}/></button><button aria-label="Copy token address" onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}><CopyIcon/></button></div></div>
-  <div className="gravity-detail-grid">
-    <div className="gravity-detail-primary">
-      <div className="gravity-detail-heading"><TokenIcon market={selected} size={49}/><div><span className="gravity-detail-category">Solana / {selected.isVerified?"Verified token":"Token"} / {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div><div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div></div>
-      <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><strong>Price chart</strong><span>5m candles · GeckoTerminal</span></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage}/></div>
-      <div className="gravity-detail-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} volume (24h)</span><span>Last quote: {selectedLastUpdated?new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting"}</span></div>
-      <div className="gravity-detail-info"><h2>Market overview <small>Jupiter Tokens V2</small></h2><div className="gravity-detail-stats">{[["Market cap",dollar(selected.marketCap,true)],["Liquidity",dollar(selected.liquidityUsd,true)],["Volume (24h)",dollar(selected.volume24h,true)],["Holders",compactNum(selected.holderCount)],["Buys (24h)",compactNum(selected.buys24h)],["Sells (24h)",compactNum(selected.sells24h)]].map(([k,v])=><div key={k}><span>{k}</span><strong>{v}</strong></div>)}</div></div>
-      <div className="gravity-detail-info"><h2>Performance <small>Price change</small></h2><div className="gravity-detail-performance">{(["5m","1h","6h","24h"] as const).map(w=><div key={w}><span>{w}</span><strong className={(windowChange(selected,w)??0)>=0?"text-up":"text-down"}>{change(windowChange(selected,w))}</strong></div>)}</div></div>
-      <div className="gravity-detail-info"><h2>Token information</h2><div className="gravity-detail-facts"><div><span>Contract</span><button onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}>{selected.mint.slice(0,11)}…{selected.mint.slice(-9)} <CopyIcon/></button></div><div><span>Network</span><strong><SolanaGlyph size={15}/> Solana</strong></div><div><span>Holders</span><strong>{compactNum(selected.holderCount)}</strong></div><div><span>Organic score</span><strong>{selected.organicScore==null?"Unavailable":selected.organicScore.toFixed(0)+"/100"}</strong></div><div><span>Verification</span><strong>{selected.isVerified?"Verified":"Not verified"}</strong></div></div><p>Market data is informational and may be delayed. Verification does not mean an asset is safe.</p></div>
-      <div className="gravity-detail-info"><div className="gravity-detail-positions-title"><h2>Your paper positions</h2><button onClick={()=>setView("positions")}>Portfolio</button></div>{open.filter(p=>p.mint===selected.mint).length===0?<p>No simulated positions for this token yet.</p>:open.filter(p=>p.mint===selected.mint).map(p=><div className="gravity-detail-position" key={p.id}><strong className={p.side==="long"?"text-up":"text-down"}>{p.side.toUpperCase()} · {p.leverage}×</strong><span>{dollar(p.margin)} virtual USDC</span><strong>{currentPrice?(getPnl(p,currentPrice)>=0?"+":"−")+dollar(Math.abs(getPnl(p,currentPrice))):"—"}</strong><button disabled={!quoteFresh} onClick={()=>closePaper(p)}>Close</button></div>)}</div>
+          {tradeOpen&&selected&&<section className="gravity-market-detail gravity-compact-market">
+    <div className="gravity-detail-navigation">
+      <button onClick={hideTrade}><ArrowLeft size={16}/> Markets</button>
+      <div className="gravity-compact-nav-right"><span><SolanaGlyph size={16}/> Solana</span><span className="gravity-market-live"><i/> {selectedLastUpdated&&Date.now()-selectedLastUpdated<30000?"Price live":"Updating"}</span>
+        <button onClick={()=>toggleWatch(selected.mint)} aria-label="Toggle watchlist"><Star size={17} fill={watchlist.includes(selected.mint)?"currentColor":"none"}/></button>
+        <button aria-label="Copy token address" onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}><CopyIcon/></button>
+      </div>
     </div>
-    <aside className="gravity-detail-sidebar"><div className="gravity-sidebar-token"><TokenIcon market={selected} size={32}/><div><strong>{selected.symbol}</strong><span>Virtual USDC · Demo</span></div></div><div className="order-panel"><div className="order-title"><strong>Simulated trade</strong><span>SIMULATED</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Paper collateral</span><span>AVAILABLE {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open paper positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open paper ${side}`:"Live price / collateral required"}</button><p className="order-disclaimer"><ShieldCheck size={15}/> Paper trades only. No custody, transactions, or real shorts. Prices may be delayed; no automatic liquidation engine.</p></div><p className="gravity-detail-risk">Simulated long or short only. No real deposits, derivatives or liquidation engine.</p><div className="gravity-detail-sidebar-stats"><h3>Market snapshot</h3><div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div><div><span>Liquidity</span><strong>{dollar(selected.liquidityUsd,true)}</strong></div><div><span>24h change</span><strong className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)}</strong></div></div></aside>
-  </div>
-</section>}
-
+    <div className="gravity-detail-grid">
+      <div className="gravity-detail-primary">
+        <div className="gravity-detail-heading">
+          <TokenIcon market={selected} size={43}/>
+          <div className="gravity-detail-names"><span className="gravity-detail-category">Solana · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
+          <div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div>
+        </div>
+        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><strong>Price chart</strong><span>5m candles · GeckoTerminal</span></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage}/></div>
+        <div className="gravity-compact-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} 24h volume</span><span>{selectedLastUpdated?"Updated "+new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting for market quote"}</span></div>
+        <div className="gravity-inline-metrics">
+          <div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div>
+          <div><span>Liquidity</span><strong>{dollar(selected.liquidityUsd,true)}</strong></div>
+          <div><span>24h volume</span><strong>{dollar(selected.volume24h,true)}</strong></div>
+          <div><span>Holders</span><strong>{compactNum(selected.holderCount)}</strong></div>
+          <div><span>Buys / sells</span><strong><span className="text-up">{compactNum(selected.buys24h)}</span> <span className="gravity-inline-slash">/</span> <span className="text-down">{compactNum(selected.sells24h)}</span></strong></div>
+        </div>
+        <div className="gravity-compact-tabs" role="tablist" aria-label="Token information">
+          <button role="tab" aria-selected={detailTab==="overview"} className={detailTab==="overview"?"active":""} onClick={()=>setDetailTab("overview")}>Overview</button>
+          <button role="tab" aria-selected={detailTab==="positions"} className={detailTab==="positions"?"active":""} onClick={()=>setDetailTab("positions")}>My positions <span>{open.filter(p=>p.mint===selected.mint).length}</span></button>
+          <button role="tab" aria-selected={detailTab==="info"} className={detailTab==="info"?"active":""} onClick={()=>setDetailTab("info")}>Token details</button>
+        </div>
+        <div className="gravity-compact-tabbody">
+          {detailTab==="overview"?<div className="gravity-compact-overview">
+            <span className="gravity-compact-subtitle">Price change</span>
+            {(["5m","1h","6h","24h"] as const).map(w=><div key={w}><span>{w}</span><strong className={(windowChange(selected,w)??0)>=0?"text-up":"text-down"}>{change(windowChange(selected,w))}</strong></div>)}
+            <span className="gravity-compact-score">Organic score <strong>{selected.organicScore==null?"—":selected.organicScore.toFixed(0)+"/100"}</strong></span>
+          </div>:detailTab==="positions"?<div className="gravity-compact-positions">
+            {open.filter(p=>p.mint===selected.mint).length===0?<span>No open paper positions for this token.</span>:open.filter(p=>p.mint===selected.mint).map(p=><div className="gravity-compact-position" key={p.id}><strong className={p.side==="long"?"text-up":"text-down"}>{p.side.toUpperCase()} {p.leverage}×</strong><span>{dollar(p.margin)} margin</span><strong className={currentPrice&&getPnl(p,currentPrice)>=0?"text-up":"text-down"}>{currentPrice?(getPnl(p,currentPrice)>=0?"+":"−")+dollar(Math.abs(Math.max(-p.margin,getPnl(p,currentPrice)))):"—"}</strong><button disabled={!quoteFresh} onClick={()=>closePaper(p)}>Close</button></div>)}
+          </div>:<div className="gravity-compact-info">
+            <div><span>Contract</span><button onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}>{selected.mint.slice(0,10)}…{selected.mint.slice(-7)} <CopyIcon/></button></div>
+            <div><span>Network</span><strong><SolanaGlyph size={14}/> Solana</strong></div>
+            <div><span>Verification</span><strong>{selected.isVerified?"Verified":"Unverified"}</strong></div>
+            <div><span>Risk flag</span><strong className={selected.isSuspicious?"text-down":""}>{selected.isSuspicious?"Flagged":"No Jupiter flag"}</strong></div>
+          </div>}
+        </div>
+      </div>
+      <aside className="gravity-detail-sidebar">
+        <div className="gravity-sidebar-token"><TokenIcon market={selected} size={30}/><div><strong>{selected.symbol} / USDC</strong><span>Simulated trading</span></div></div>
+        <div className="order-panel"><div className="order-title"><strong>Simulated trade</strong><span>SIMULATED</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Paper collateral</span><span>AVAILABLE {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open paper positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open paper ${side}`:"Live price / collateral required"}</button><p className="order-disclaimer"><ShieldCheck size={15}/> Paper trades only. No custody, transactions, or real shorts. Prices may be delayed; no automatic liquidation engine.</p></div>
+        <p className="gravity-compact-risk">Paper positions use virtual funds only. No live orders or real liquidations.</p>
+      </aside>
+    </div>
+  </section>}
         </>:<div className="portfolio-layout"><div className="portfolio-summary"><div className="portfolio-hero"><span>YOUR SIMULATED EQUITY</span><strong>{dollar(equity)}</strong><small>Not a real wallet balance</small></div><div><span>AVAILABLE COLLATERAL</span><strong>{dollar(freeBalance(positions))}</strong></div><div><span>LOCKED COLLATERAL</span><strong>{dollar(lockedMargin(positions))}</strong></div><div><span>REALIZED P&L</span><strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></div></div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Open positions <span className="subtle-count">{open.length}</span></span><span className="position-note">MARKS REFRESH EVERY ~15S</span></div>{open.length===0?<div className="feed-message position-empty"><Wallet size={24}/><strong>No open paper positions</strong><span>Find a token to open your first simulated long or short.</span><button onClick={()=>setView("markets")} className="pill pill-outline">Browse markets</button></div>:<div className="positions-list">{open.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>MARK</small><strong>{dollar(prices[p.mint])}</strong></div><div><small>UNREALIZED P&L</small><strong className={!prices[p.mint]?"":getPnl(p,prices[p.mint])>=0?"text-up":"text-down"}>{prices[p.mint]?`${getPnl(p,prices[p.mint])>=0?"+":"−"}${dollar(Math.abs(Math.max(-p.margin,getPnl(p,prices[p.mint]))))}`:"—"}</strong></div><button className="pill pill-outline position-close" disabled={!prices[p.mint]} onClick={()=>closePaper(p)}>Close</button></div>)}</div>}</div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Trade history <span className="subtle-count">{closed.length}</span></span></div>{closed.length===0?<div className="history-empty">Your closed paper positions will appear here.</div>:<div className="positions-list">{closed.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>EXIT</small><strong>{dollar(p.exit)}</strong></div><div><small>REALIZED P&L</small><strong className={(p.pnl||0)>=0?"text-up":"text-down"}>{(p.pnl||0)>=0?"+":"−"}{dollar(Math.abs(p.pnl||0))}</strong></div><span className="closed-tag"><Check size={14}/> CLOSED</span></div>)}</div>}</div><div className="portfolio-fineprint"><CircleHelp size={16}/> Paper P&L is indicative, based on sampled market prices. No fees, slippage, funding, liquidations, wallet deposits, or real trades. Local browser storage only.</div></div>}
       </div>
     </main>
