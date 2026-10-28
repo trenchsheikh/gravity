@@ -1,17 +1,13 @@
-"use client";
-import {useState} from "react";
-
-/** Uses the exact source artwork when available, gracefully retaining the older
- * chart asset until the PNG is present in public/gravity-hero-exact.png. */
+/** The live hero uses a checked-in image, not a missing asset or a client-side error handler.
+ * Its vector format stays sharp on retina displays and transparent over the blue shader.
+ */
 export default function HeroArtwork(){
- const [source,setSource]=useState("/gravity-hero-exact.png");
  return <img
-   src={source}
-   width={1983}
-   height={793}
-   alt="Blue candlestick chart with floating green Long and red Short trading markers"
+   src="/gravity-chart-hero.svg"
+   width={1800}
+   height={700}
+   alt="Blue price chart with green Long and red Short position markers"
    decoding="async"
    fetchPriority="high"
-   onError={()=>{if(source!=="/gravity-chart-hero.svg")setSource("/gravity-chart-hero.svg")}}
  />;
 }
