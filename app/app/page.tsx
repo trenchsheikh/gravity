@@ -50,6 +50,7 @@ export default function Terminal(){
   const [tradeOpen,setTradeOpen]=useState(false);
   const [query,setQuery]=useState("");
   const [markets,setMarkets]=useState<Market[]>([]);
+  const [catalog,setCatalog]=useState<Market[]>([]);
   const [selected,setSelected]=useState<Market|null>(null);
   const [loading,setLoading]=useState(true);
   const [selectedLastUpdated,setSelectedLastUpdated]=useState<number|null>(null);
@@ -75,7 +76,9 @@ export default function Terminal(){
   const [watchlist,setWatchlist]=useState<string[]>([]);
   const [watchOnly,setWatchOnly]=useState(false);
 
-  useEffect(()=>{setPositions(getPositions());try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}},[]);
+  useEffect(()=>{setPositions(getPositions());try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}
+    try{const tokens=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]");if(Array.isArray(tokens))setCatalog(tokens.filter((m:Market)=>m&&typeof m.mint==="string").slice(0,280));}catch{}
+  },[]);
 
   useEffect(()=>{
     const onVisibility=()=>setPageVisible(document.visibilityState==="visible");
@@ -103,6 +106,14 @@ export default function Terminal(){
       if(!r.ok)throw Error(data.error||"Market feed temporarily unavailable");
       const list=(data.markets||[]) as Market[];
       setMarkets(list);setProvider((data.providers||[]).join(" + "));setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
+      if(!query.trim())try{
+        const oldCatalog=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]") as Market[];
+        const seen=new Map<string,Market>();
+        for(const m of list)if(m?.mint)seen.set(m.mint,m);
+        for(const m of oldCatalog)if(m?.mint&&!seen.has(m.mint))seen.set(m.mint,m);
+        const recent=[...seen.values()].slice(0,280);
+        localStorage.setItem("gravity.token.catalog.v1",JSON.stringify(recent));setCatalog(recent);
+      }catch{}
       if(!query.trim())try{
         const cache=JSON.parse(localStorage.getItem("gravity.market.cache.v2")||"{}");
         cache[tab+":"+windowSize]={time:Date.now(),markets:list.slice(0,120)};
@@ -151,11 +162,11 @@ export default function Terminal(){
     return()=>{closed=true;clearInterval(timer)};
   },[tradeOpen,selected?.mint,pageVisible]);
   const visible=useMemo(()=>{
-    const list=watchOnly?markets.filter(m=>watchlist.includes(m.mint)):markets;
+    const list=watchOnly?watchlist.map(mint=>markets.find(m=>m.mint===mint)||catalog.find(m=>m.mint===mint)).filter((m):m is Market=>!!m):markets;
     if(tab==="new"&&!query.trim()&&!watchOnly) return list;
     const sortValue=(m:Market)=>sortBy==="cap"?m.marketCap:sortBy==="liquidity"?m.liquidityUsd:sortBy==="volume"?windowVolume(m,windowSize):windowChange(m,windowSize);
     return [...list].sort((a,b)=>(sortValue(b)??Number.NEGATIVE_INFINITY)-(sortValue(a)??Number.NEGATIVE_INFINITY));
-  },[markets,watchOnly,watchlist,tab,query,sortBy,windowSize]);
+  },[markets,catalog,watchOnly,watchlist,tab,query,sortBy,windowSize]);
   const openTrade=(m:Market)=>{setSelected(m);setSelectedLastUpdated(null);setTradeOpen(true);setMobileTrading(true);window.scrollTo({top:0,behavior:"instant"})};
   const hideTrade=()=>{setTradeOpen(false);setMobileTrading(false)};
   const open=positions.filter(p=>!p.closedAt);
@@ -177,9 +188,9 @@ export default function Terminal(){
       <div className="axiom-header-left">
         <Brand small/>
         <nav className="axiom-primary-nav" aria-label="App navigation">
-          <button className={view==="markets"&&!watchOnly&&tab==="trending"?"active":""} onClick={()=>{setView("markets");setTab("trending");setWatchOnly(false)}}>Discover</button>
-          <button className={view==="markets"&&!watchOnly&&tab==="new"?"active":""} onClick={()=>{setView("markets");setTab("new");setWatchOnly(false)}}>New launches</button>
-          <button className={view==="markets"&&watchOnly?"active":""} onClick={()=>{setView("markets");setWatchOnly(true)}}>Watchlist</button>
+          <button className={view==="markets"&&!watchOnly&&tab==="trending"?"active":""} onClick={()=>{setView("markets");setTab("trending");setWatchOnly(false);setTradeOpen(false)}}>Discover</button>
+          <button className={view==="markets"&&!watchOnly&&tab==="new"?"active":""} onClick={()=>{setView("markets");setTab("new");setWatchOnly(false);setTradeOpen(false)}}>New launches</button>
+          <button className={view==="markets"&&watchOnly?"active":""} onClick={()=>{setView("markets");setWatchOnly(true);setTradeOpen(false)}}>Watchlist</button>
           <button className={view==="positions"?"active":""} onClick={()=>setView("positions")}>Portfolio <span className="axiom-nav-count">{open.length}</span></button>
         </nav>
       </div>
