@@ -99,10 +99,9 @@ export async function GET(req:NextRequest) {
   const mint=(req.nextUrl.searchParams.get("mint")||"").trim();
   if(!isMint(mint)) return NextResponse.json({error:"Invalid token mint"},{status:400});
   const supplied=allowedImageUrl(req.nextUrl.searchParams.get("src"));
-  const official=await getJupiterIcon(mint);
-  const candidateUrls=[supplied,official].filter((url):url is URL=>!!url);
   const seen=new Set<string>();
-  for(const base of candidateUrls){
+  async function attempt(base:URL|null):Promise<NextResponse|null> {
+    if(!base)return null;
     const urls=[base];
     const path=base.pathname.match(/\/ipfs\/([^/?#]+)/);
     if(path && ["ipfs.io","dweb.link"].includes(base.hostname)) {
@@ -123,6 +122,14 @@ export async function GET(req:NextRequest) {
         }
       });
     }
+    return null;
   }
+  // The Jupiter feed already supplies an image URL for most tokens; try it first
+  // rather than waiting for an unnecessary metadata round trip.
+  const initial=await attempt(supplied);
+  if(initial)return initial;
+  const discovered=await getJupiterIcon(mint);
+  const alternative=await attempt(discovered);
+  if(alternative)return alternative;
   return new NextResponse(null,{status:404,headers:{"Cache-Control":"public, s-maxage=300"}});
 }
