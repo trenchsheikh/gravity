@@ -13,6 +13,18 @@ export type Market = {
   createdAt: number | null;
   url: string;
   source: "jupiter";
+  change5m: number | null;
+  change1h: number | null;
+  change6h: number | null;
+  volume5m: number | null;
+  volume1h: number | null;
+  volume6h: number | null;
+  buys24h: number | null;
+  sells24h: number | null;
+  holderCount: number | null;
+  organicScore: number | null;
+  isVerified: boolean;
+  isSuspicious: boolean;
 };
 
 export const isMint = (value: string) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(value.trim());
@@ -52,6 +64,21 @@ export function fromJupiter(item: Record<string, unknown>): Market | null {
     change24h: numeric(stats.priceChange),
     marketCap: numeric(item.mcap) ?? numeric(item.fdv),
     volume24h: volumeA !== null || volumeB !== null ? (volumeA || 0) + (volumeB || 0) : null,
+    change5m: numeric((item.stats5m as Record<string,unknown> | undefined)?.priceChange),
+    change1h: numeric((item.stats1h as Record<string,unknown> | undefined)?.priceChange),
+    change6h: numeric((item.stats6h as Record<string,unknown> | undefined)?.priceChange),
+    volume5m: numeric((item.stats5m as Record<string,unknown> | undefined)?.buyVolume) !== null || numeric((item.stats5m as Record<string,unknown> | undefined)?.sellVolume) !== null
+      ? (numeric((item.stats5m as Record<string,unknown> | undefined)?.buyVolume)||0)+(numeric((item.stats5m as Record<string,unknown> | undefined)?.sellVolume)||0) : null,
+    volume1h: numeric((item.stats1h as Record<string,unknown> | undefined)?.buyVolume) !== null || numeric((item.stats1h as Record<string,unknown> | undefined)?.sellVolume) !== null
+      ? (numeric((item.stats1h as Record<string,unknown> | undefined)?.buyVolume)||0)+(numeric((item.stats1h as Record<string,unknown> | undefined)?.sellVolume)||0) : null,
+    volume6h: numeric((item.stats6h as Record<string,unknown> | undefined)?.buyVolume) !== null || numeric((item.stats6h as Record<string,unknown> | undefined)?.sellVolume) !== null
+      ? (numeric((item.stats6h as Record<string,unknown> | undefined)?.buyVolume)||0)+(numeric((item.stats6h as Record<string,unknown> | undefined)?.sellVolume)||0) : null,
+    buys24h: numeric(stats.numBuys),
+    sells24h: numeric(stats.numSells),
+    holderCount: numeric(item.holderCount),
+    organicScore: numeric(item.organicScore),
+    isVerified: item.isVerified === true,
+    isSuspicious: (item.audit as Record<string,unknown> | undefined)?.isSus === true,
     liquidityUsd: numeric(item.liquidity),
     // Jupiter's firstPool.id may be the token mint, not the actual pool.
     // Historical chart route resolves the correct GeckoTerminal pool by mint.

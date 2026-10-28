@@ -48,17 +48,19 @@ function normalize(data: unknown[], onlyPump: boolean): Market[] {
 export async function GET(request: NextRequest) {
   const tab = request.nextUrl.searchParams.get("tab") === "trending" ? "trending" : "new";
   const query = (request.nextUrl.searchParams.get("q") || "").trim().slice(0, 90);
+  const requestedWindow = request.nextUrl.searchParams.get("window");
+  const window = requestedWindow && ["5m","1h","6h","24h"].includes(requestedWindow) ? requestedWindow : "1h";
   try {
     if (query) {
       const result = normalize(await jupiter("/search?query=" + encodeURIComponent(query)), !isMint(query));
       const markets = isMint(query) ? result.filter(m => m.mint === query) : result;
       return response({markets: markets.slice(0,30), providers: ["Jupiter Tokens V2"], query, updatedAt: Date.now()});
     }
-    const endpoint = tab === "new" ? "/recent" : "/toptrending/1h?limit=100";
+    const endpoint = tab === "new" ? "/recent" : `/toptrending/${window}?limit=100`;
     const result = normalize(await jupiter(endpoint),true);
     if (tab === "new") result.sort((a,b)=>(b.createdAt || 0)-(a.createdAt || 0));
     else result.sort((a,b)=>(b.volume24h || 0)-(a.volume24h || 0));
-    return response({markets:result.slice(0,80),providers:["Jupiter Tokens V2"],updatedAt:Date.now(),tab});
+    return response({markets:result.slice(0,80),providers:["Jupiter Tokens V2"],updatedAt:Date.now(),tab,window});
   } catch (err) {
     const message = err instanceof Error ? err.message : "Jupiter token data unavailable.";
     return response({markets:[],providers:["Jupiter Tokens V2"],error:message},503);
