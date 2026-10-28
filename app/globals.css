@@ -245,3 +245,10 @@
  .feature-preview .preview-search{font-size:12px}
  .cinematic-mobile-copy h2{font-size:39px}
 }
+
+/* Keep the product art visible and readable on phones instead of shrinking it to a thin strip. */
+@media(max-width:760px){
+ .cinematic-artwork{height:clamp(240px,68vw,370px)}
+ .cinematic-artwork img{height:100%;width:100%;object-fit:cover;object-position:59% center}
+}
+@media(max-width:420px){.cinematic-artwork{height:260px}}
