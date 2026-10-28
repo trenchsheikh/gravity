@@ -48,7 +48,7 @@ export default function Home(){
     <span className="simple-hero-disclaimer"><ShieldCheck size={16} aria-hidden="true"/> Paper trading with virtual funds · No real orders</span>
    </div>
    <div className="simple-device-stage">
-    <img src="/gravity-laptop-phone.webp" width="1568" height="789" alt="Gravity laptop and iPhone trading app concepts showing token markets, price charts and simulated long and short controls" fetchPriority="high" decoding="async"/>
+    <img src="/gravity-hero-devices-clean.webp" width="1708" height="921" alt="Gravity laptop and iPhone trading app concepts showing token markets, price charts and simulated long and short controls" fetchPriority="high" decoding="async"/>
    </div>
    <p className="simple-hero-footnote">Illustrative screen design. Gravity currently offers simulated trading, not real leveraged positions.</p>
   </section>

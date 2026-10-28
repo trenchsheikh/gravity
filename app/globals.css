@@ -654,3 +654,44 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
  .gravity-landing .simple-hero-disclaimer{margin-top:17px}
 }
 @media(prefers-reduced-motion:reduce){.gravity-landing .shader-backdrop{opacity:.75}}
+
+
+/* Hero devices: original transparent artwork, never crop or mask the image. */
+.gravity-landing .simple-hero .simple-device-stage{
+ width:min(1120px,92vw);
+ max-width:100%;
+ overflow:visible;
+ margin:30px auto 0;
+ line-height:0;
+}
+.gravity-landing .simple-hero .simple-device-stage img{
+ display:block;
+ width:100%;
+ max-width:100%;
+ height:auto;
+ position:static;
+ left:auto;
+ right:auto;
+ transform:none;
+ object-fit:contain;
+ object-position:center;
+ image-rendering:auto;
+ clip-path:none;
+ mask-image:none;
+ -webkit-mask-image:none;
+ filter:drop-shadow(0 22px 32px rgba(0,6,20,.35));
+}
+@media(max-width:760px){
+ .gravity-landing .simple-hero .simple-device-stage{
+   width:calc(100% - 22px);
+   max-width:100%;
+   overflow:visible;
+   margin:29px auto 0;
+ }
+ .gravity-landing .simple-hero .simple-device-stage img{
+   width:100%;
+   max-width:100%;
+   left:auto;
+   transform:none;
+ }
+}
