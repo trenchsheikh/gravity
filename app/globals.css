@@ -695,3 +695,277 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
    transform:none;
  }
 }
+
+
+/* Gravity market terminal: compact professional full-width token screener.
+   The landing page is intentionally not affected by these rules. */
+.axiom-terminal{
+  --ax-bg:#08090e;--ax-panel:#0d0f15;--ax-subtle:#11141d;
+  --ax-border:#252937;--ax-muted:#8491a9;--ax-white:#f4f7ff;
+  --ax-blue:#5c79ff;--ax-green:#14d6a0;--ax-red:#ff4d74;
+  display:block;min-height:100dvh;width:100%;background:var(--ax-bg);
+  color:var(--ax-white);font-family:'Manrope',Arial,sans-serif;
+  padding-bottom:38px;
+}
+.axiom-terminal *{box-sizing:border-box}
+.axiom-terminal button:focus-visible,.axiom-terminal a:focus-visible,.axiom-terminal [role="button"]:focus-visible,
+.axiom-terminal input:focus-visible,.axiom-terminal select:focus-visible{
+  outline:2px solid #a2baff;outline-offset:2px;
+}
+.axiom-terminal .text-up{color:var(--ax-green)!important}
+.axiom-terminal .text-down{color:var(--ax-red)!important}
+.axiom-terminal .brand{font-size:24px;font-weight:760;letter-spacing:-.075em;white-space:nowrap}
+.axiom-terminal .brand-small .brand-symbol{width:29px;height:29px;border:0;background:transparent;border-radius:0}
+.axiom-terminal .brand-symbol img{object-fit:contain;transform:none;filter:none}
+.axiom-terminal .brand-period{color:#6ea4ff}
+.axiom-terminal .axiom-header{
+ display:flex;align-items:center;justify-content:space-between;
+ height:56px;padding:0 25px;gap:15px;border-bottom:1px solid #242938;
+ background:#080a10;position:sticky;top:0;z-index:38;
+}
+.axiom-header-left,.axiom-header-right,.axiom-primary-nav{display:flex;align-items:center;min-width:0}
+.axiom-header-left{gap:29px}
+.axiom-primary-nav{gap:6px}
+.axiom-primary-nav button{appearance:none;border:0;background:transparent;color:#c3cade;
+ font-size:12px;font-weight:740;padding:18px 11px;height:54px;border-bottom:2px solid transparent;
+ white-space:nowrap;transition:color .12s}
+.axiom-primary-nav button:hover{color:#fff}
+.axiom-primary-nav button.active{color:#6e8cff;border-bottom-color:#5978ff}
+.axiom-nav-count{font-size:10px;background:#1a2339;padding:2px 5px;border-radius:5px;color:#a9bbf6}
+.axiom-header-right{gap:12px;margin-left:auto}
+.axiom-search{height:34px;border:1px solid #2b3245;border-radius:21px;display:flex;gap:8px;
+ align-items:center;padding:0 10px;color:#b5c4e3;min-width:250px;background:#0b0d14}
+.axiom-search input{font-family:inherit;flex:1;min-width:0;background:none;border:0;outline:none;
+ color:#e7efff;font-size:11px}
+.axiom-search input::placeholder{color:#8a97ae}
+.axiom-search kbd{border:1px solid #2a2d40;color:#7e90b1;padding:1px 7px;border-radius:7px;font-size:11px}
+.axiom-search button{display:flex;align-items:center;background:transparent;border:0;color:#8392ab}
+.axiom-network{display:flex;align-items:center;gap:7px;height:34px;padding:0 13px;
+ border:1px solid #25314a;border-radius:23px;font-weight:750;font-size:12px;white-space:nowrap}
+.axiom-network>svg:last-child{color:#8798bb}
+.axiom-balance{display:flex;align-items:center;gap:8px;border:1px solid #30374d;background:#171b2a;
+ border-radius:23px;padding:0 11px;height:34px;white-space:nowrap}
+.axiom-balance>svg{color:#96b2ff}
+.axiom-balance span{font-size:12px;font-weight:750;font-variant-numeric:tabular-nums}
+.axiom-balance small{font-size:9px;color:#8091bd;font-weight:700}
+.axiom-home{height:31px;width:31px;display:grid;place-items:center;border:1px solid #2a3147;border-radius:50%;color:#9fb1d4}
+.axiom-utility{height:31px;padding:0 26px;border-bottom:1px solid #1b2030;background:#090b11;
+ color:#8792aa;display:flex;align-items:center;justify-content:space-between;gap:15px;
+ font-size:10px;font-weight:650;letter-spacing:.015em}
+.axiom-utility>div{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.axiom-utility svg{color:#7d92c3}
+.axiom-utility>div span:not(.axiom-status-dot){color:#3f4962}
+.axiom-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ax-green);box-shadow:0 0 12px #17cc98}
+.axiom-main{width:100%;max-width:none;min-height:calc(100dvh - 130px);padding:0 clamp(14px,4.8vw,100px) 46px}
+.axiom-workspace{max-width:1600px;margin:0 auto;min-width:0}
+.axiom-section-bar{height:68px;display:flex;justify-content:space-between;align-items:end;
+ gap:20px;padding-bottom:15px}
+.axiom-section-tabs{display:flex;align-items:center;gap:24px}
+.axiom-section-tabs button{border:0;background:none;padding:0;font-size:16px;font-weight:750;
+ color:#8b99b3;white-space:nowrap}
+.axiom-section-tabs button.current{color:#fff}
+.axiom-section-tabs button:hover{color:#d9e5ff}
+.axiom-section-tabs button span{font-size:10px;color:#7593ce;font-weight:650}
+.axiom-table-tools{display:flex;align-items:center;gap:4px}
+.axiom-time-label{font-size:11px;color:#8091ae;margin-right:7px}
+.axiom-table-tools button{border:0;background:none;padding:6px 8px;color:#acbad5;
+ font-size:12px;font-weight:700}
+.axiom-table-tools button.selected{color:#5579ff}
+.axiom-table-tools button:hover{color:#fff}
+.axiom-v-divider{display:block;width:1px;height:17px;background:#2f3447;margin:0 9px}
+.axiom-table-tools .axiom-refresh{display:grid;place-items:center;color:#9aabc8}
+.axiom-list-container{background:#0d0f14;border:1px solid #292e3b;border-radius:5px;overflow:hidden}
+.axiom-list-topline{height:42px;display:flex;align-items:center;justify-content:space-between;
+ padding:0 18px;border-bottom:1px solid #272c38;background:#0e1016}
+.axiom-list-topline>div:first-child{display:flex;align-items:center;gap:8px}
+.axiom-list-topline strong{font-size:12px;font-weight:750}
+.axiom-source-pill{font-size:9px;color:#9daeff;background:#151b30;border-radius:4px;
+ border:1px solid #344165;padding:4px 6px;font-weight:750}
+.axiom-list-count{font-size:10px;color:#8191a7;margin-left:6px}
+.axiom-ordering{display:flex;align-items:center;gap:7px}
+.axiom-ordering label{font-size:10px;color:#8795ad}
+.axiom-ordering select{font-size:11px;font-weight:680;padding:4px 7px;border-radius:5px;
+ background:#141721;color:#e0e9ff;border:1px solid #30384f;cursor:pointer}
+.axiom-list-scroll{width:100%;overflow-x:auto;scrollbar-color:#34415c #0c1017}
+.axiom-cols{display:grid;grid-template-columns:minmax(260px,2.5fr) minmax(126px,1.1fr) minmax(85px,.75fr) minmax(85px,.75fr) minmax(91px,.78fr) minmax(172px,1.3fr) minmax(108px,.95fr);
+ min-width:985px;gap:10px;align-items:center;padding:0 19px}
+.axiom-table-head{height:36px;position:sticky;top:0;z-index:2;border-bottom:1px solid #252934;
+ background:#111218;color:#8994ae;font-size:10px;font-weight:620}
+.axiom-row{min-height:78px;border-bottom:1px solid #1e212b;background:#0d0f14;cursor:pointer;
+ transition:background .12s;color:#f3f4fa;font-variant-numeric:tabular-nums}
+.axiom-row:last-child{border-bottom:0}
+.axiom-row:hover{background:#151926}
+.axiom-row:focus-visible{background:#191f2f}
+.axiom-pair{display:flex;align-items:center;gap:11px;min-width:0}
+.axiom-token-icon{position:relative;width:44px;height:44px;flex:none}
+.axiom-token-icon .token-icon{border-radius:7px;border:1px solid #54545c;background:#1e2535}
+.axiom-token-icon .axiom-chain-mini{position:absolute;right:-4px;bottom:-4px;width:17px;height:17px;
+ display:grid;place-items:center;background:#07090c;border:1px solid #38435c;border-radius:50%}
+.axiom-pair-content{min-width:0;display:flex;flex-direction:column;gap:6px}
+.axiom-pair-content>div:first-child{display:flex;align-items:center;gap:5px;min-width:0}
+.axiom-pair-content strong{font-size:13px;font-weight:800;overflow:hidden;text-overflow:ellipsis;max-width:90px;white-space:nowrap}
+.axiom-pair-content>div:first-child>span:nth-child(2){font-size:11px;color:#8d98b0;
+ overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.axiom-verified{flex:none;color:#83aeff!important;font-weight:800;font-size:13px!important}
+.axiom-pair-meta{display:flex;gap:10px;align-items:center;color:#8597b5;font-size:10px;min-width:0}
+.axiom-pair-meta>span{white-space:nowrap}
+.axiom-age{color:var(--ax-green)!important;font-weight:780}
+.axiom-pair-meta .axiom-safe{color:#94a6c5}
+.axiom-cap{display:grid;grid-template-columns:1fr 58px;gap:4px;align-items:center;min-width:0}
+.axiom-cap>strong{font-size:12px;color:#fff;font-weight:760;grid-column:1}
+.axiom-cap>span:nth-child(2){grid-column:1;font-size:11px;font-weight:720}
+.axiom-change-meter{height:26px;border-left:1px solid #3f4966;display:flex;align-items:center;
+ width:58px;grid-column:2;grid-row:1/span 2;position:relative;padding:0 3px}
+.axiom-change-meter i{display:block;max-width:100%;height:2px;border-radius:2px;
+ background:#12b78d;box-shadow:0 0 7px #17c99d40}
+.axiom-change-meter.negative i{background:#f54c7b;box-shadow:0 0 7px #f54c7b40}
+.axiom-value{font-size:12px;color:#fff;font-weight:740;white-space:nowrap}
+.axiom-txn{display:flex;flex-direction:column;gap:7px}
+.axiom-txn strong{font-size:12px;font-weight:750}
+.axiom-txn>span{font-size:10px;font-weight:730;white-space:nowrap}
+.axiom-txn b{font-weight:700}
+.axiom-info{display:grid;grid-template-columns:1fr 1fr;gap:6px 9px;font-size:10px;
+ color:#9baac1;align-items:center}
+.axiom-info>span{white-space:nowrap}
+.axiom-info b{font-weight:720;color:#c4d1e5}
+.axiom-risk-ok{color:#10d69b;font-weight:750}
+.axiom-risk-neutral{color:#9aa2b4}
+.axiom-risk-flag{color:#ff5a75;font-weight:750}
+.axiom-action-buttons{display:flex;align-items:center;gap:7px}
+.axiom-trade-btn{height:29px;min-width:83px;flex:1;background:#5c75ff;color:#06112d;border:0;
+ font-size:12px;font-weight:800;border-radius:999px;padding:0 12px;white-space:nowrap}
+.axiom-trade-btn:hover{background:#8b9cff}
+.axiom-watch-btn{height:28px;width:28px;flex:none;display:grid;place-items:center;
+ border:1px solid #283149;border-radius:50%;color:#6c7893;background:#131721}
+.axiom-watch-btn:hover,.axiom-watch-btn.is-watched{color:#90a5ff;border-color:#405797}
+.axiom-state{min-height:240px;display:flex;flex-direction:column;justify-content:center;
+ align-items:center;text-align:center;gap:10px;color:#8e9eb6;padding:24px}
+.axiom-state strong{color:#e3eafa;font-size:15px}
+.axiom-state p{max-width:360px;font-size:12px;line-height:1.5;margin:0}
+.axiom-state button{background:#506bff;border:0;color:#fff;padding:10px 17px;
+ border-radius:99px;font-weight:750}
+.axiom-skeleton{height:78px;border-bottom:1px solid #252a36;display:flex;align-items:center;gap:13px;padding:0 19px}
+.axiom-skeleton>*{display:block;animation:pulse 1.25s infinite;background:#242c40;border-radius:6px;height:10px}
+.axiom-skeleton i{width:40px;height:40px}
+.axiom-skeleton span{width:21%;height:13px}
+.axiom-skeleton b{margin-left:auto;width:30%}
+.axiom-statusbar{position:fixed;bottom:0;left:0;right:0;height:32px;z-index:32;
+ background:#0a0d13;border-top:1px solid #2a3040;display:flex;align-items:center;
+ justify-content:space-between;gap:14px;padding:0 20px;color:#8697b5;
+ font-size:10px;font-weight:700;letter-spacing:.01em}
+.axiom-statusbar>div{display:flex;align-items:center;gap:9px;min-width:0}
+.axiom-statusbar strong{color:#aebef8;font-weight:760}
+.axiom-divider{width:1px;height:11px;background:#303a53;margin:0 4px}
+.axiom-statusbar>div>span{white-space:nowrap}
+.axiom-mobile-search{display:none}
+.axiom-overlay{position:fixed;inset:0;z-index:58;background:#000b;border:0;cursor:default}
+.axiom-ticket{position:fixed;top:0;right:0;bottom:0;width:min(445px,100vw);z-index:59;
+ background:#0d1018;border-left:1px solid #3b4561;box-shadow:-35px 0 65px #000a;
+ display:flex;flex-direction:column}
+.axiom-ticket-header{height:60px;flex:none;padding:0 17px;display:flex;justify-content:space-between;
+ align-items:center;border-bottom:1px solid #2c364b;background:#0b101a}
+.axiom-ticket-header>div{display:flex;align-items:center;gap:9px;color:#b6c9ea;font-size:11px;font-weight:800}
+.axiom-ticket-header>button{color:#a4b0c7;background:none;border:0;
+ display:grid;place-items:center;height:36px;width:36px}
+.axiom-paper-chip{border:1px solid #394b6c;padding:5px 7px;border-radius:5px;
+ background:#1a2539;color:#91a9df;font-size:9px;font-weight:750}
+.axiom-ticket-content{overflow-y:auto;flex:1;padding:15px 14px 34px;scrollbar-color:#4b638c #111924}
+.axiom-ticket-content .asset-panel,.axiom-ticket-content .order-panel{width:100%;margin:0 0 13px;
+ box-shadow:none;border-radius:10px;border:1px solid #303950;position:static!important;
+ background:#111621}
+.axiom-ticket-content .asset-panel{padding:17px}
+.axiom-ticket-content .asset-top .token-icon{border-radius:50%}
+.axiom-ticket-content .asset-pricing{margin:18px 0 15px}
+.axiom-ticket-content .asset-pricing strong{font-size:25px}
+.axiom-ticket-content .chart-container{background:#0b0f19}
+.axiom-ticket-content .chart-live{height:170px}
+.axiom-ticket-content .chart-live svg{height:138px}
+.axiom-ticket-content .order-panel{padding:19px}
+.axiom-ticket-content .direction-switch{border-radius:8px}
+.axiom-ticket-content .direction-switch button{border-radius:6px}
+.axiom-ticket-content .direction-switch button.long.active{background:#183e36;color:#39f0ae}
+.axiom-ticket-content .direction-switch button.short.active{background:#432131;color:#ff7799}
+.axiom-ticket-content .leverage-options button.active{border-color:#627cff;background:#25385e;color:#aebdff}
+.axiom-ticket-content .pill-accent{background:#5c75ff;color:white}
+.axiom-ticket-content .pill-accent:hover{background:#879dff}
+.axiom-ticket-content .order-disclaimer{color:#91a0bc}
+.axiom-ticket-content .order-title>span{color:#b4c3ef;background:#232e4b}
+.axiom-ticket-content .asset-stats span{font-size:10px}
+.axiom-ticket-content .asset-stats strong{font-size:12px}
+.axiom-ticket-content .chart-header{font-size:10px}
+.axiom-ticket-content .chart-ticks{font-size:9px}
+.axiom-terminal .portfolio-layout{padding:27px 0 40px}
+.axiom-terminal .portfolio-summary>div{background:#11151e;border:1px solid #2a3242}
+.axiom-terminal .portfolio-summary>.portfolio-hero{background:#151e32;border-color:#465c98}
+.axiom-terminal .portfolio-hero strong{color:#90a5ff}
+.axiom-terminal .positions-panel{background:#11151e;border-color:#30394b}
+.axiom-terminal .positions-panel .panel-bar{background:#131a27}
+.axiom-terminal .position-row{border-color:#222b3a}
+@media(max-width:1180px){
+ .axiom-primary-nav button{padding-inline:7px;font-size:11px}
+ .axiom-header-left{gap:17px}
+ .axiom-search{min-width:192px;width:200px}
+ .axiom-balance small{display:none}
+ .axiom-main{padding-inline:20px}
+ .axiom-cols{min-width:930px}
+}
+@media(max-width:860px){
+ .axiom-header{height:53px;padding:0 13px}
+ .axiom-primary-nav{gap:3px}
+ .axiom-primary-nav button{font-size:11px;padding-inline:6px}
+ .axiom-header-left{gap:11px}
+ .axiom-terminal .brand{font-size:21px}
+ .axiom-search,.axiom-balance{display:none}
+ .axiom-utility{padding-inline:13px}
+ .axiom-utility>div:last-child{display:none}
+ .axiom-main{padding-inline:12px}
+ .axiom-mobile-search{display:flex;align-items:center;gap:9px;margin-top:14px;background:#101522;
+ border:1px solid #323d58;border-radius:9px;height:42px;padding:0 12px;color:#a4b6d5}
+ .axiom-mobile-search input{background:transparent;border:0;outline:0;color:#fff;font-size:13px;min-width:0;width:100%}
+ .axiom-section-bar{height:63px}
+ .axiom-section-tabs{gap:13px}
+ .axiom-section-tabs button{font-size:14px}
+ .axiom-table-tools{gap:0}
+ .axiom-time-label{display:none}
+ .axiom-table-tools button{padding-inline:6px}
+ .axiom-list-count{display:none}
+}
+@media(max-width:620px){
+ .axiom-header .axiom-primary-nav button:nth-child(2),.axiom-header .axiom-primary-nav button:nth-child(3){display:none}
+ .axiom-header-right{gap:6px}
+ .axiom-header .axiom-network{height:29px;padding:0 7px;font-size:11px;gap:5px}
+ .axiom-header .axiom-home{width:28px;height:28px}
+ .axiom-utility{font-size:9px}
+ .axiom-section-bar{height:auto;min-height:90px;display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:12px 0}
+ .axiom-table-tools{margin-left:0}
+ .axiom-section-tabs button{font-size:14px}
+ .axiom-list-topline{padding:0 10px}
+ .axiom-source-pill{font-size:8px}
+ .axiom-ordering label{display:none}
+ .axiom-ordering select{max-width:105px}
+ .axiom-cols{min-width:0;padding:0 9px;grid-template-columns:minmax(136px,1fr) minmax(80px,92px) 69px;gap:5px}
+ .axiom-cols>*:nth-child(3),.axiom-cols>*:nth-child(4),.axiom-cols>*:nth-child(5),.axiom-cols>*:nth-child(6){display:none}
+ .axiom-table-head{font-size:9px}
+ .axiom-table-head span:nth-child(7){text-align:center}
+ .axiom-row{min-height:72px}
+ .axiom-token-icon,.axiom-token-icon .token-icon{width:36px!important;height:36px!important}
+ .axiom-pair{gap:7px}
+ .axiom-pair-content strong{font-size:12px;max-width:61px}
+ .axiom-pair-content>div:first-child>span:nth-child(2){display:none}
+ .axiom-pair-meta{font-size:9px;gap:6px}
+ .axiom-pair-meta .axiom-safe{display:none}
+ .axiom-cap{grid-template-columns:1fr;gap:2px}
+ .axiom-cap .axiom-change-meter{display:none}
+ .axiom-cap>strong{font-size:11px}
+ .axiom-cap>span:nth-child(2){font-size:10px}
+ .axiom-trade-btn{min-width:54px;height:31px;font-size:11px;padding:0 8px}
+ .axiom-watch-btn{display:none}
+ .axiom-statusbar{padding-inline:10px;height:36px;font-size:9px}
+ .axiom-statusbar>div:first-child .axiom-divider,.axiom-statusbar>div:first-child .axiom-divider~*{display:none}
+ .axiom-statusbar>div:last-child span:nth-child(2),.axiom-statusbar>div:last-child span:nth-child(3){display:none}
+ .axiom-terminal{padding-bottom:39px}
+ .axiom-ticket-content{padding:10px}
+ .axiom-ticket-header{height:55px}
+ .axiom-terminal .portfolio-summary{grid-template-columns:1fr 1fr}
+ .axiom-terminal .positions-panel .position-row{grid-template-columns:1fr 1fr}
+}
