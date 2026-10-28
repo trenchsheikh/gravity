@@ -12,7 +12,9 @@ export async function GET(req:NextRequest){
   ];
   for(const provider of providers){
     try{
-      const res=await fetch(provider.url,{headers:{"Accept":"application/json",...provider.headers},
+      const headers: Record<string,string> = {"Accept":"application/json"};
+      if(provider.url.includes("/tokens/v2/")&&process.env.JUPITER_API_KEY) headers["x-api-key"]=process.env.JUPITER_API_KEY;
+      const res=await fetch(provider.url,{headers,
         next:{revalidate:3600},signal:AbortSignal.timeout(5500)});
       if(!res.ok)continue;
       const data:unknown=await res.json();
