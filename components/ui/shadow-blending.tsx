@@ -318,7 +318,7 @@ export function ShaderBackground({ className }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
-    const canvas = canvasRef.current
+    const canvas = canvasRef.current!
     if (!canvas) return
     const pendingRelease = pendingContextReleases.get(canvas)
     if (pendingRelease !== undefined) window.clearTimeout(pendingRelease)
