@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 const MAX_BYTES = 1_500_000;
 const ALLOWED_HOSTS = [
   "axiomtrading-v2.axiom-cdn.io", "ipfs.io", "dweb.link",
-  "imagedelivery.net", "raw.githubusercontent.com",
+  "imagedelivery.net", "images.pump.fun", "raw.githubusercontent.com",
   "arweave.net", "assets.coingecko.com", "metadata.j7tracker.io"
 ];
 const ALLOWED_SUFFIXES = [
@@ -128,6 +128,11 @@ export async function GET(req:NextRequest) {
   // rather than waiting for an unnecessary metadata round trip.
   const initial=await attempt(supplied);
   if(initial)return initial;
+  // Most Pump.fun mints have a native image-CDN record even if their IPFS gateway fails.
+  if(mint.endsWith("pump")){
+    const native=await attempt(allowedImageUrl("https://images.pump.fun/coin-image/"+mint));
+    if(native)return native;
+  }
   const discovered=await getJupiterIcon(mint);
   const alternative=await attempt(discovered);
   if(alternative)return alternative;
