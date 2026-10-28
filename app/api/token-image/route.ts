@@ -112,7 +112,7 @@ export async function GET(req:NextRequest) {
       if(seen.has(url.href))continue;
       seen.add(url.href);
       const image=await downloadImage(url);
-      if(image) return new NextResponse(image.data,{
+      if(image) return new NextResponse(new Blob([image.data.buffer as ArrayBuffer],{type:image.type}),{
         status:200,
         headers:{
           "Content-Type":image.type,
