@@ -162,3 +162,39 @@
 .terminal-shell .market-row,.terminal-shell .side-link,.terminal-shell .order-summary,.terminal-shell .market-filter button{font-size:13px}
 .terminal-shell .pill{font-size:13px}
 .terminal-shell .order-disclaimer{line-height:1.65}
+
+
+/* Cinematic Gravity hero — image-based artwork and accessible HTML CTA links. */
+.cinematic-hero{position:relative;width:100%;margin:0 auto;padding:12px 0 24px;background:#030504;text-align:center;isolation:isolate}
+.cinematic-accessible-title{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+.cinematic-artwork{position:relative;width:100%;max-width:2180px;margin-inline:auto;overflow:hidden;aspect-ratio:2180/721;background:#030504}
+.cinematic-artwork>img{display:block;object-fit:cover;width:100%;height:100%;border:0}
+.cinematic-artwork::after{content:"";position:absolute;inset:auto 0 0;height:8%;background:linear-gradient(to bottom,transparent,#030504);pointer-events:none;z-index:1}
+.cinematic-actions{position:absolute;z-index:2;left:50%;top:54.5%;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;gap:20px;padding:14px 22px;border-radius:99px;background:rgba(1,5,3,.86);box-shadow:0 5px 45px 18px rgba(1,5,3,.85);white-space:nowrap}
+.cinematic-actions .pill{min-height:54px;min-width:207px;font-size:16px;font-weight:750;padding-inline:24px}
+.cinematic-hero-disclaimer{max-width:900px;margin:2px auto 0;padding:8px 20px;color:#9fac9a;font-size:14px;line-height:1.6}
+.cinematic-mobile-copy{display:none}
+@media(max-width:1050px) and (min-width:761px){
+ .cinematic-actions{top:56.5%;gap:12px;padding:9px 15px}
+ .cinematic-actions .pill{min-width:150px;min-height:45px;font-size:14px}
+}
+@media(max-width:760px){
+ .cinematic-hero{padding:28px 0 18px;text-align:left}
+ .cinematic-mobile-copy{position:relative;display:block;z-index:2;padding:15px max(20px,6vw) 7px;text-align:center}
+ .cinematic-mobile-label{display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:.08em;color:#c8dcbc}
+ .cinematic-mobile-copy h2{font-size:clamp(40px,9.4vw,62px);line-height:1.02;letter-spacing:-.065em;margin:28px auto 17px;max-width:640px;color:#f8fff6}
+ .cinematic-mobile-copy h2 em{font-style:normal;color:#b9fc68}
+ .cinematic-mobile-copy p{font-size:17px;line-height:1.6;max-width:470px;margin:0 auto;color:#b8c6b6}
+ .cinematic-mobile-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:27px}
+ .cinematic-mobile-actions .pill{font-size:15px;min-height:52px;padding:0 19px}
+ .cinematic-artwork{width:100%;aspect-ratio:auto;height:335px;background-image:url('/gravity-cinematic-hero.webp');background-repeat:no-repeat;background-size:auto 510px;background-position:50% -175px;overflow:hidden}
+ .cinematic-artwork>img,.cinematic-actions{display:none}
+ .cinematic-artwork::after{height:27%}
+ .cinematic-hero-disclaimer{margin-top:0;text-align:center;font-size:13px;padding:0 22px 8px}
+}
+@media(max-width:430px){
+ .cinematic-mobile-copy{padding-inline:16px}
+ .cinematic-mobile-copy h2{font-size:clamp(37px,10vw,50px)}
+ .cinematic-mobile-actions .pill{min-width:0;flex:1;padding:0 12px}
+ .cinematic-artwork{height:285px;background-size:auto 445px;background-position:50% -160px}
+}

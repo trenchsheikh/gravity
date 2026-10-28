@@ -15,19 +15,27 @@ export default function Home(){
    <nav aria-label="Primary navigation"><a href="#product">The platform</a><a href="#how">How it works</a><a href="#about">About Gravity</a></nav>
    <Link href="/app" className="pill pill-nav">Launch app</Link>
   </header>
-  <section className="hero frame" aria-labelledby="gravity-title">
-   <div className="hero-left">
-    <div className="eyebrow"><span className="status-dot"/> SOLANA MEMECOIN TRADING, REIMAGINED</div>
-    <h1 id="gravity-title">Long or Short<br/><em>Memecoins.</em></h1>
-    <p className="hero-description">Explore Pump.fun tokens, choose which way you think the price will move, and open simulated long or short positions. One clean terminal. Real market data. No real money.</p>
-    <div className="hero-actions"><Link href="/app" className="pill pill-accent">Start paper trading</Link><a href="#product" className="pill pill-outline">Explore the platform</a></div>
-    <div className="hero-trust"><ShieldCheck size={20} aria-hidden="true"/><span>Paper trading only · $10,000 virtual balance · No deposits</span></div>
-   </div>
-   <div className="hero-art hero-product-art">
-    <div className="hero-product-frame"><div className="scene-image scene-hero" role="img" aria-label="Illustrative trading interface with price charts and long-short controls"/><div className="hero-visual-caption"><span className="status-dot"/> BUILT FOR BOTH SIDES</div></div>
-    <span className="hero-image-note">Illustrative interface artwork</span>
-   </div>
+  <section className="cinematic-hero" aria-labelledby="gravity-title">
+    <h1 id="gravity-title" className="cinematic-accessible-title">Long or Short Memecoins</h1>
+    <div className="cinematic-mobile-copy">
+      <span className="cinematic-mobile-label"><span className="status-dot"/> BUILT FOR SOLANA MEMECOINS</span>
+      <h2>Long or Short<br/><em>Memecoins.</em></h2>
+      <p>Explore Pump.fun tokens and simulate long or short positions using live market prices.</p>
+      <div className="cinematic-mobile-actions">
+        <Link href="/app" className="pill pill-accent">Explore tokens</Link>
+        <a href="#product" className="pill pill-outline">How it works</a>
+      </div>
+    </div>
+    <div className="cinematic-artwork">
+      <img src="/gravity-cinematic-hero.webp" alt="Gravity concept art featuring glowing memecoin orbits, long or short messaging, and illustrated desktop and mobile trading interfaces" width="2180" height="721" fetchPriority="high" />
+      <div className="cinematic-actions" aria-label="Start using Gravity">
+        <Link href="/app" className="pill pill-accent">Explore tokens</Link>
+        <a href="#product" className="pill pill-outline">How it works</a>
+      </div>
+    </div>
+    <p className="cinematic-hero-disclaimer">Illustrative interface artwork · Gravity currently offers paper trading only, with virtual funds and no real orders.</p>
   </section>
+
   <div className="ticker-strip" aria-label="Platform capabilities"><div className="ticker-content">PUMP.FUN TOKEN DISCOVERY <span>✳</span> SIMULATED LONGS & SHORTS <span>✳</span> LIVE MARKET PRICES <span>✳</span> CLEAR POSITION TRACKING <span>✳</span> PUMP.FUN TOKEN DISCOVERY <span>✳</span> SIMULATED LONGS & SHORTS <span>✳</span> LIVE MARKET PRICES</div></div>
   <section className="section frame gravity-features" id="product">
    <div className="section-heading"><div><span className="overline">THE PLATFORM</span><h2>Memecoins move fast.<br/><span>Stay in control.</span></h2></div><p>From discovery to a closed paper position, Gravity gives you a clear way to explore both sides of Solana's fastest-moving markets.</p></div>
