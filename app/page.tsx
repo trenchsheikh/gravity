@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {Activity, ChartNoAxesCombined, CircleCheck, Compass, Radar, Search, ShieldCheck, SlidersHorizontal, Target, TrendingDown, TrendingUp} from "lucide-react";
 import MarketingHeader from "@/components/MarketingHeader";
+import { ShaderBackground } from "@/components/ui/shadow-blending";
 
 const perks=[
  {icon:Radar,title:"Discover fresh launches",body:"Browse new Pump.fun-origin tokens and look up markets by contract address. Real prices where available.",scene:"discovery"},
@@ -37,13 +38,13 @@ function FeaturePreview({scene}:{scene:PreviewScene}){
 
 export default function Home(){
  return <main className="landing gravity-landing">
-  <div className="landing-bg" aria-hidden="true"/>
+  <div className="shader-backdrop" aria-hidden="true"><ShaderBackground className="gravity-shader-canvas"/></div>
   <MarketingHeader/>
   <section className="simple-hero" aria-labelledby="gravity-title">
    <div className="simple-hero-copy">
-    <span className="simple-hero-eyebrow"><span className="status-dot"/> SOLANA MEMECOINS · PAPER TRADING</span>
-    <h1 id="gravity-title">Long or short<br/><em>memecoins.</em></h1>
-    <p>Discover Pump.fun tokens and simulate both sides of the market with live price data. All in one clean terminal.</p>
+    <span className="simple-hero-eyebrow">LONG OR SHORT</span>
+    <h1 id="gravity-title">Memecoins<span className="hero-dot">.</span></h1>
+    <p>Explore Pump.fun tokens and simulate leveraged trades in either direction. Up or down.</p>
     <span className="simple-hero-disclaimer"><ShieldCheck size={16} aria-hidden="true"/> Paper trading with virtual funds · No real orders</span>
    </div>
    <div className="simple-device-stage">
