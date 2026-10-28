@@ -8,14 +8,14 @@ const KEY = process.env.JUPITER_API_KEY?.trim();
 function response(data: object, status = 200) {
   return NextResponse.json(data, {
     status,
-    headers: {"Cache-Control": status === 200 ? "public, s-maxage=30, stale-while-revalidate=45" : "no-store"}
+    headers: {"Cache-Control": status === 200 ? "public, s-maxage=12, stale-while-revalidate=30" : "no-store"}
   });
 }
 
 async function jupiter(path: string): Promise<unknown[]> {
   const res = await fetch(BASE + path, {
     headers: {Accept: "application/json", ...(KEY ? {"x-api-key": KEY} : {})},
-    next: {revalidate: 30},
+    next: {revalidate: 12},
     signal: AbortSignal.timeout(8500)
   });
   if (!res.ok) {

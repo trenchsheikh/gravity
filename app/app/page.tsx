@@ -76,21 +76,46 @@ export default function Terminal(){
   const [watchOnly,setWatchOnly]=useState(false);
 
   useEffect(()=>{setPositions(getPositions());try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}},[]);
+
+  useEffect(()=>{
+    const onVisibility=()=>setPageVisible(document.visibilityState==="visible");
+    onVisibility();
+    document.addEventListener("visibilitychange",onVisibility);
+    return()=>document.removeEventListener("visibilitychange",onVisibility);
+  },[]);
+  useEffect(()=>{
+    if(query.trim())return;
+    try{
+      const all=JSON.parse(localStorage.getItem("gravity.market.cache.v2")||"{}");
+      const item=all[tab+":"+windowSize];
+      if(item&&Array.isArray(item.markets)&&Number.isFinite(item.time)&&Date.now()-item.time<6*3600000){
+        setMarkets(item.markets.slice(0,120));setCacheTime(item.time);setLoading(false);
+        setCacheNotice("Cached market list — refreshing");
+      }
+    }catch{}
+  },[tab,windowSize,query]);
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),4500);return()=>clearTimeout(id)},[toast]);
   const fetchMarkets=useCallback(async(signal?:AbortSignal)=>{
-    setLoading(true);setError("");
+    setError("");
     try {
       const params=new URLSearchParams({tab,window:windowSize});if(query.trim())params.set("q",query.trim());
       const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();
       if(!r.ok)throw Error(data.error||"Market feed temporarily unavailable");
       const list=(data.markets||[]) as Market[];
-      setMarkets(list);setProvider((data.providers||[]).join(" + "));setRefreshed(Date.now());
+      setMarkets(list);setProvider((data.providers||[]).join(" + "));setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
+      if(!query.trim())try{
+        const cache=JSON.parse(localStorage.getItem("gravity.market.cache.v2")||"{}");
+        cache[tab+":"+windowSize]={time:Date.now(),markets:list.slice(0,120)};
+        Object.keys(cache).sort((a,b)=>(cache[b]?.time||0)-(cache[a]?.time||0)).slice(8).forEach(k=>delete cache[k]);
+        localStorage.setItem("gravity.market.cache.v2",JSON.stringify(cache));
+      }catch{}
       setSelected(current=>{if(!current)return list[0]||null;return list.find(m=>m.mint===current.mint)||current});
       setPrices(old=>({...old,...Object.fromEntries(list.filter(m=>m.priceUsd!=null&&m.priceUsd>0).map(m=>[m.mint,m.priceUsd!]))}));
-    } catch(e){if((e as Error).name!=="AbortError"){setError(e instanceof Error?e.message:"Could not load markets");setMarkets([])}}finally{if(!signal?.aborted)setLoading(false)}
+    } catch(e){if((e as Error).name!=="AbortError"){const msg=e instanceof Error?e.message:"Could not load markets";setError(msg);setCacheNotice(msg)}}finally{if(!signal?.aborted)setLoading(false)}
   },[tab,query,windowSize]);
   useEffect(()=>{const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query?450:0);return()=>{clearTimeout(timeout);c.abort()}},[fetchMarkets,tick]);
-  useEffect(()=>{const id=setInterval(()=>setTick(x=>x+1),30000);return()=>clearInterval(id)},[]);
+  useEffect(()=>{if(!pageVisible)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible]);
+  useEffect(()=>{if(pageVisible)setTick(x=>x+1)},[pageVisible]);
   useEffect(()=>{if(!selected?.mint){setCandles([]);setChartMessage("Historical market data isn't available for this token yet.");return}
     const c=new AbortController();setCandlesLoading(true);setCandles([]);fetch(`/api/candles?mint=${encodeURIComponent(selected.mint)}`,{signal:c.signal}).then(r=>r.json()).then(d=>{if(!c.signal.aborted){setCandles(d.candles||[]);setChartMessage(d.error||"No historical candles found for this pool.")}}).catch(()=>{if(!c.signal.aborted)setChartMessage("The chart provider is unavailable.")}).finally(()=>{if(!c.signal.aborted)setCandlesLoading(false)});
     return()=>c.abort();
@@ -105,6 +130,26 @@ export default function Terminal(){
     };
     void refresh();const timer=setInterval(refresh,45000);return()=>{cancelled=true;clearInterval(timer)};
   },[positions]);
+
+  useEffect(()=>{
+    if(!tradeOpen||!selected?.mint||!pageVisible)return;
+    const mint=selected.mint;let closed=false;
+    const refresh=async()=>{
+      try{
+        const res=await fetch("/api/markets?q="+encodeURIComponent(mint),{cache:"no-store"});
+        if(!res.ok)throw Error("Quote unavailable");
+        const data=await res.json();
+        const token=(data.markets||[]).find((m:Market)=>m.mint===mint) as Market|undefined;
+        if(!token||token.priceUsd==null||token.priceUsd<=0)throw Error("No market price");
+        if(closed)return;
+        setSelected(current=>current?.mint===mint?token:current);
+        setPrices(previous=>({...previous,[mint]:token.priceUsd!}));
+        setSelectedLastUpdated(Date.now());
+      }catch{if(!closed)setSelectedLastUpdated(null)}
+    };
+    void refresh();const timer=setInterval(refresh,12000);
+    return()=>{closed=true;clearInterval(timer)};
+  },[tradeOpen,selected?.mint,pageVisible]);
   const visible=useMemo(()=>{
     const list=watchOnly?markets.filter(m=>watchlist.includes(m.mint)):markets;
     if(tab==="new"&&!query.trim()&&!watchOnly) return list;
@@ -145,7 +190,7 @@ export default function Terminal(){
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
       </div>
     </header>
-    <div className="axiom-utility"><div><ShieldCheck size={14}/> SIMULATED TRADING — NO LIVE ORDERS <span>·</span> Jupiter market data</div><div><span className="axiom-status-dot"/>{refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"—"}</div></div>
+    <div className="axiom-utility"><div><ShieldCheck size={14}/> SIMULATED TRADING — NO LIVE ORDERS <span>·</span> Jupiter market data</div><div><span className="axiom-status-dot"/>{cacheNotice?"Using cached data":refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"—"}</div></div>
     <main className="axiom-main">
       <div className="axiom-workspace">
         <div className="axiom-mobile-search"><Search size={16}/><input value={query} onChange={e=>{setQuery(e.target.value);setView("markets")}} placeholder="Search token or contract address"/></div>
@@ -164,9 +209,10 @@ export default function Terminal(){
               <button className="axiom-refresh" aria-label="Refresh token list" onClick={()=>setTick(v=>v+1)}><RefreshCw size={15} className={loading?"spin":""}/></button>
             </div>
           </div>
+          {cacheNotice&&<div className="gravity-cache-banner"><Activity size={15}/><span>{markets.length?"Showing available cached markets. ":""}{cacheNotice}</span></div>}
           <div className="axiom-list-container">
             <div className="axiom-list-topline">
-              <div><SolanaGlyph size={20}/><strong>SOLANA</strong><span className="axiom-source-pill">JUPITER DATA</span><span className="axiom-list-count">{visible.length} tokens</span></div>
+              <div><SolanaGlyph size={20}/><strong>SOLANA</strong><span className="axiom-source-pill">JUPITER DATA</span><span className="axiom-list-count">{visible.length} tokens</span><span className="gravity-cache-time">{cacheTime?"Synced "+new Date(cacheTime).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):""}</span></div>
               <div className="axiom-ordering"><label htmlFor="gravity-sort">Sort by</label><select id="gravity-sort" value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)}>
                 <option value="cap">Market cap</option><option value="liquidity">Liquidity</option><option value="volume">Volume</option><option value="change">Price change</option>
               </select></div>
