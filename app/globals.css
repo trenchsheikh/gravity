@@ -1342,3 +1342,96 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
   width:100%;max-width:100%;height:auto;left:auto;transform:none!important;
  }
 }
+
+
+/* Gravity real-time Birdeye candlesticks: more chart, less chrome. */
+.axiom-terminal .gravity-compact-market .gravity-detail-grid {
+  grid-template-columns:minmax(0,1fr) 305px;
+  gap:15px;
+}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart {
+  background:#090f1c;
+  border:1px solid #263951;
+  border-radius:8px;
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart-top {
+  flex:none;
+  height:auto;
+  min-height:45px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:7px 14px;
+  padding:7px 12px;
+  background:#0c1627;
+  border-bottom:1px solid #253950;
+}
+.gravity-chart-label{display:flex;align-items:center;gap:10px;white-space:nowrap}
+.gravity-chart-label strong{font-size:13px;color:#eef5ff}
+.gravity-chart-label span{font-size:10px;color:#95a9c5}
+.gravity-chart-timeframes{display:flex;align-items:center;gap:3px}
+.gravity-chart-timeframes button{
+  border:1px solid transparent;background:transparent;color:#93a9c7;
+  border-radius:5px;font:700 11px Manrope,Arial,sans-serif;
+  min-width:33px;min-height:29px;padding:5px 7px;cursor:pointer;
+}
+.gravity-chart-timeframes button:hover{background:#162c49;color:#f0f6ff}
+.gravity-chart-timeframes button.active{color:#aed7ff;background:#1c3a60;border-color:#426d9d}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .gravity-interactive-chart{
+  position:relative;display:block;min-width:0;min-height:0;
+  height:100%!important;flex:1 1 auto;background:#090f1c;
+}
+.gravity-lwc-chart{width:100%;height:100%;min-height:0;position:relative}
+.gravity-chart-refresh{position:absolute;top:10px;left:12px;z-index:2;display:flex;align-items:center;gap:6px;font-size:10px;color:#95b2d8;background:#14243bcf;border:1px solid #29466b;border-radius:6px;padding:6px 9px}
+.gravity-chart-provider{position:absolute;bottom:8px;left:9px;z-index:2;padding:3px 6px;border-radius:5px;background:#0b1622ce;color:#91a8c7;font-size:10px;pointer-events:none}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-empty{
+ min-height:235px!important;height:100%!important;flex:1;gap:8px;
+ justify-content:center;padding:22px;text-align:center;line-height:1.55;
+ background:#090f1c;
+}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-empty span{font-size:13px;max-width:480px}
+.axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-empty small{font-size:11px;color:#8ca5c5;max-width:420px}
+@media(min-width:1050px) and (min-height:700px) {
+  .axiom-terminal:has(.gravity-compact-market) .gravity-compact-market .gravity-detail-primary{
+    display:grid;grid-template-rows:auto minmax(270px,1fr) auto auto auto minmax(52px,auto);
+    min-height:0;overflow:hidden;
+  }
+  .axiom-terminal:has(.gravity-compact-market) .gravity-compact-market .gravity-detail-chart{
+    height:100%;min-height:0;
+  }
+  .axiom-terminal:has(.gravity-compact-market) .gravity-compact-market .gravity-detail-chart .gravity-interactive-chart {
+    min-height:0;height:0!important;flex:1 1 auto;
+  }
+  .axiom-terminal:has(.gravity-compact-market) .gravity-compact-market .gravity-detail-grid{min-height:0;flex:1;overflow:hidden}
+  .axiom-terminal:has(.gravity-compact-market) .gravity-compact-market .gravity-detail-primary{height:100%}
+}
+@media(min-width:751px) and (max-height:699px) {
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart{height:430px}
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart .gravity-interactive-chart{height:385px!important}
+}
+@media(min-width:751px) and (max-width:1049px) {
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart{height:410px}
+}
+@media(max-width:750px) {
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart{
+    height:380px;min-height:330px;
+  }
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart .gravity-interactive-chart{
+    height:330px!important;flex:1;
+  }
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart .chart-empty{
+    min-height:275px!important;
+  }
+  .gravity-chart-label span{font-size:9px}
+  .gravity-chart-timeframes button{font-size:10px;min-width:29px;min-height:31px;padding:4px 6px}
+}
+@media(max-width:390px) {
+  .axiom-terminal .gravity-compact-market .gravity-detail-chart{height:340px;min-height:300px}
+  .gravity-chart-label{width:100%}
+  .gravity-chart-timeframes{justify-content:space-between;width:100%}
+}
