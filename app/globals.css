@@ -40,3 +40,125 @@
   .positions-panel .position-row{gap:12px;padding:13px}
   .landing .hero-art{height:315px}
 }
+
+/* Brand refresh — transparent logo, illustration sprite and readable type. */
+.brand{gap:9px}
+.brand-symbol,.brand-small .brand-symbol{width:44px;height:44px;border:none;border-radius:0;background:transparent;overflow:visible;display:grid;place-items:center;flex-shrink:0}
+.brand-symbol img{display:block;width:100%;height:100%;object-fit:contain;transform:none}
+.brand-small .brand-symbol{width:38px;height:38px}
+.gravity-landing .marketing-nav{height:92px}
+.gravity-landing .marketing-nav nav{font-size:16px;gap:35px}
+.gravity-landing .pill{font-size:16px;min-height:52px;padding-inline:24px}
+.gravity-landing .pill-nav{background:#ecf2e6;color:#141714}
+.gravity-landing .hero{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:36px;min-height:640px;padding-top:53px;padding-bottom:88px}
+.gravity-landing .hero-left{padding:0}
+.gravity-landing .eyebrow,.gravity-landing .overline{font-size:14px;font-weight:700;letter-spacing:.075em}
+.gravity-landing .eyebrow{color:#bcf17f}
+.gravity-landing .hero h1{font-size:clamp(54px,6.7vw,103px);line-height:1.045;letter-spacing:-.074em;margin:28px 0;white-space:normal}
+.gravity-landing .hero h1 em{color:var(--lime);font-style:normal}
+.gravity-landing .hero-description{font-size:18px;color:#b0bcb0;line-height:1.75;max-width:570px}
+.gravity-landing .hero-actions{display:flex;gap:13px;margin-top:33px;flex-wrap:wrap}
+.gravity-landing .hero-actions .pill{min-height:56px;padding:0 27px}
+.hero-trust{display:flex;align-items:center;gap:11px;margin-top:32px;color:#a9b6a5;font-size:14px;line-height:1.5}
+.hero-trust svg{color:var(--lime);flex-shrink:0}
+.gravity-landing .hero-art.hero-product-art{height:auto;min-height:420px;display:flex;flex-direction:column;gap:14px;overflow:visible;position:relative;isolation:auto}
+.gravity-landing .hero-product-art::before,.gravity-landing .hero-product-art::after{display:none}
+.hero-product-frame{width:100%;max-width:700px;border:1px solid #354434;border-radius:24px;background:linear-gradient(135deg,#192218,#101410);padding:10px;overflow:hidden;position:relative;box-shadow:0 26px 94px rgba(0,0,0,.48),0 0 65px rgba(128,203,85,.09)}
+.hero-product-frame::after{content:"";pointer-events:none;position:absolute;inset:0;background:linear-gradient(145deg,transparent 50%,rgba(182,244,110,.07));border-radius:24px}
+.scene-image{background-image:url('/gravity-scenes.webp');background-repeat:no-repeat;background-size:200% 200%;background-color:#121a12}
+.scene-hero{background-position:0 0;width:100%;aspect-ratio:1.36;border-radius:16px}
+.scene-discovery{background-position:100% 0}
+.scene-position{background-position:0 100%}
+.scene-performance{background-position:100% 100%}
+.hero-visual-caption{position:absolute;bottom:25px;left:24px;display:flex;align-items:center;gap:9px;font-family:'DM Mono',monospace;font-size:13px;font-weight:600;color:#ddf7c3;background:rgba(13,22,13,.88);border:1px solid #455b3d;border-radius:999px;padding:11px 15px;z-index:1}
+.hero-image-note{font-size:14px;color:#a0ac9d;align-self:flex-end}
+.gravity-landing .ticker-strip{height:63px}
+.gravity-landing .ticker-content{font-size:14px;font-weight:650}
+.gravity-landing .section{padding-block:110px}
+.gravity-landing .section-heading{align-items:flex-end;gap:35px;margin-bottom:37px}
+.gravity-landing .section-heading>p{font-size:17px;max-width:430px;line-height:1.65;color:#a5b2a2}
+.gravity-landing .section h2,.gravity-landing .process h2,.gravity-landing .bottom-cta h2{font-size:clamp(42px,5vw,70px);line-height:1.09;letter-spacing:-.068em}
+.gravity-landing .section h2 span{color:#8c9989}
+.gravity-landing .feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.gravity-landing .feature-card{min-height:0;padding:24px;border-radius:22px;background:linear-gradient(154deg,#1b221a,#111711);border-color:#303a30}
+.gravity-landing .card-top{color:#9aa99a}
+.feature-index{font-family:'DM Mono',monospace;font-size:14px;letter-spacing:.055em;font-weight:600}
+.feature-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:#273322;color:#baf37b;border:1px solid #526b42;flex:none}
+.feature-art{margin:25px 0 24px;border-radius:16px;overflow:hidden;aspect-ratio:1.55;border:1px solid #344232;background-color:#0d120d;display:block}
+.gravity-landing .feature-card h3{font-size:25px;line-height:1.15;margin:0 0 12px;letter-spacing:-.05em}
+.gravity-landing .feature-card p{font-size:16px;line-height:1.68;color:#a7b4a3;max-width:none}
+.gravity-landing .process{padding-block:100px;gap:75px;grid-template-columns:.9fr 1.1fr}
+.gravity-landing .process-intro>p{font-size:17px;color:#a3afa1;line-height:1.75;max-width:460px;margin:25px 0 0}
+.gravity-landing .steps>div{display:grid;grid-template-columns:62px 1fr;align-items:center;gap:20px;padding:24px 0}
+.gravity-landing .step-icon{display:grid;place-items:center;width:58px;height:58px;border:1px solid #48583e;background:#202b1d;color:var(--lime);border-radius:50%}
+.gravity-landing .steps h3{font-size:22px;margin:0 0 9px}
+.gravity-landing .steps p{font-size:16px;color:#a3b09f;line-height:1.65}
+.gravity-landing .bottom-cta{grid-template-columns:1.15fr .85fr;min-height:385px;padding:55px 62px;gap:70px;background:radial-gradient(circle at 85% 50%,#2b4323 0%,#1b2b1a 33%,#131a13 76%);border-color:#42573c}
+.gravity-landing .bottom-cta .cta-message{padding:0}
+.gravity-landing .bottom-cta h2{font-size:clamp(45px,5vw,76px);margin:21px 0}
+.gravity-landing .bottom-cta p{font-size:17px;line-height:1.7;max-width:540px;margin:0 0 28px;color:#b4c1ae}
+.cta-badges{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cta-badges>div{display:flex;flex-direction:column;justify-content:space-between;gap:24px;min-height:128px;border:1px solid #52694c;background:#1d2c1b;color:#dcebd6;border-radius:18px;padding:21px;font-size:15px;font-weight:600}
+.cta-badges svg{color:var(--lime)}
+.gravity-landing .footer{font-size:14px;letter-spacing:0;line-height:1.6;padding-block:30px;color:#a1ada0}
+@media(max-width:1100px){
+ .gravity-landing .hero{gap:24px;min-height:540px}
+ .gravity-landing .hero h1{font-size:clamp(49px,6vw,78px)}
+ .gravity-landing .hero-description{font-size:17px}
+ .gravity-landing .feature-grid{gap:12px}
+ .gravity-landing .feature-card{padding:18px}
+ .gravity-landing .feature-card h3{font-size:22px}
+ .gravity-landing .feature-card p{font-size:15px}
+ .gravity-landing .process{gap:35px}
+ .gravity-landing .bottom-cta{gap:30px;padding:48px}
+}
+@media(max-width:760px){
+ .gravity-landing .marketing-nav{height:74px}
+ .gravity-landing .marketing-nav .pill-nav{min-height:43px;padding-inline:17px;font-size:14px}
+ .gravity-landing .brand{font-size:24px}
+ .gravity-landing .brand-symbol{width:37px;height:37px}
+ .gravity-landing .hero{display:flex;flex-direction:column;align-items:stretch;padding-top:70px;padding-bottom:65px;gap:32px;min-height:0}
+ .gravity-landing .hero h1{font-size:clamp(49px,9.6vw,70px);margin:23px 0}
+ .gravity-landing .hero-description{font-size:17px;line-height:1.65}
+ .gravity-landing .eyebrow{font-size:13px}
+ .gravity-landing .hero-actions .pill{font-size:15px;min-height:52px;padding:0 19px}
+ .gravity-landing .hero-art.hero-product-art{min-height:0;width:100%;height:auto;margin:0}
+ .hero-image-note{font-size:13px}
+ .hero-visual-caption{font-size:12px;left:15px;bottom:15px;padding:8px 12px}
+ .gravity-landing .ticker-content{font-size:13px}
+ .gravity-landing .section{padding-block:70px}
+ .gravity-landing .section-heading{display:block;margin-bottom:26px}
+ .gravity-landing .section-heading>p{margin:22px 0 0;font-size:16px}
+ .gravity-landing .section h2,.gravity-landing .process h2,.gravity-landing .bottom-cta h2{font-size:clamp(40px,8vw,56px)}
+ .gravity-landing .feature-grid{grid-template-columns:1fr;gap:14px}
+ .gravity-landing .feature-card{padding:24px}
+ .feature-art{aspect-ratio:1.9;margin:22px 0}
+ .gravity-landing .feature-card p{font-size:16px}
+ .gravity-landing .process{display:block;padding-block:70px}
+ .gravity-landing .process-intro>p{font-size:16px}
+ .gravity-landing .steps{margin-top:30px}
+ .gravity-landing .steps>div{grid-template-columns:53px 1fr;gap:16px;padding-block:19px}
+ .gravity-landing .step-icon{width:50px;height:50px}
+ .gravity-landing .steps h3{font-size:20px}
+ .gravity-landing .steps p{font-size:15px}
+ .gravity-landing .bottom-cta{margin-block:70px;display:flex;flex-direction:column;align-items:stretch;padding:35px 25px;gap:38px}
+ .gravity-landing .bottom-cta .cta-message{padding:0}
+ .gravity-landing .bottom-cta p{font-size:16px}
+ .cta-badges{gap:9px}
+ .cta-badges>div{min-height:115px;padding:14px;font-size:13px}
+ .gravity-landing .footer{font-size:13px}
+}
+@media(max-width:390px){
+ .gravity-landing .hero h1{font-size:44px}
+ .gravity-landing .hero-actions{gap:9px}
+ .gravity-landing .hero-actions .pill{width:100%}
+ .gravity-landing .hero-description{font-size:16px}
+ .gravity-landing .eyebrow{font-size:12px}
+ .gravity-landing .feature-card{padding:18px}
+ .gravity-landing .bottom-cta{padding:29px 20px}
+}
+/* Keep terminal metadata and touch controls comfortably legible. */
+.terminal-shell .market-table-head,.terminal-shell .market-foot,.terminal-shell .asset-stats span,.terminal-shell .chart-header,.terminal-shell .chart-ticks,.terminal-shell .order-summary span,.terminal-shell .order-title>span,.terminal-shell .input-title span:last-child,.terminal-shell .position-row small,.terminal-shell .sidebar-label,.terminal-shell .metric>span,.terminal-shell .metric>small,.terminal-shell .workspace-tag,.terminal-shell .portfolio-summary span,.terminal-shell .portfolio-summary small,.terminal-shell .position-note,.terminal-shell .terminal-footer,.terminal-shell .closed-tag,.terminal-shell .order-disclaimer{font-size:12px;line-height:1.4}
+.terminal-shell .market-row,.terminal-shell .side-link,.terminal-shell .order-summary,.terminal-shell .market-filter button{font-size:13px}
+.terminal-shell .pill{font-size:13px}
+.terminal-shell .order-disclaimer{line-height:1.65}

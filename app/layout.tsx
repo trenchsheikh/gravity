@@ -1,16 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-
 export const metadata: Metadata = {
-  title: "Gravity — Trade the other direction",
-  description: "Discover Pump.fun tokens and explore both sides of the market. Paper trading with live market data. No deposits. No real orders.",
-  openGraph: {
-    title: "Gravity — What goes up has another side",
-    description: "The sharpest way to discover and paper-trade Solana's newest tokens.",
-    images: ["/gravity-orbit.webp"],
-  },
+ title: "Gravity — Long or Short Memecoins",
+ description: "Discover Pump.fun memecoins, explore live Solana token prices, and simulate long or short positions. Paper trading only. No deposits or real trades.",
+ openGraph: {title:"Gravity — Long or Short Memecoins",description:"Discover fresh Pump.fun launches and paper-trade the upside or downside using real market data.",images:["/gravity-scenes.webp"]},
 };
-
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
-}
+export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){return <html lang="en"><body>{children}</body></html>}
