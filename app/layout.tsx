@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     default: "Gravity | Memecoins & Stock Tokens",
     template: "%s | Gravity",
   },
-  description: "Explore memecoins and tokenized stocks, view live charts, and follow long or short positions in one trading terminal. Virtual funds only. No real orders.",
+  description: "Explore memecoins and tokenized stocks, view live charts, and preview long or short directions. Live market data; on-chain orders not yet enabled.",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml", sizes: "any" }],
     shortcut: "/icon.svg",
@@ -17,14 +17,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Gravity",
     title: "Gravity | Memecoins & Stock Tokens",
-    description: "Two markets. One trading terminal. Discover tokens, follow price movement, and track long or short positions.",
+    description: "Two markets. One trading terminal. Discover tokens and follow live market prices across memecoins and stock tokens.",
     url: "/",
     images: [{ url: "/gravity-cinematic-hero.webp", alt: "Gravity market trading platform" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Gravity | Memecoins & Stock Tokens",
-    description: "Memecoins and stock tokens in one clean trading terminal. Real market data. Virtual funds only.",
+    description: "Memecoins and stock tokens in one clean trading terminal. Real market data. Orders not yet enabled.",
     images: ["/gravity-cinematic-hero.webp"],
   },
 };
