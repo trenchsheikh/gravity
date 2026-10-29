@@ -74,6 +74,8 @@ export default function Terminal(){
   const [tradeOpen,setTradeOpen]=useState(false);
   const [query,setQuery]=useState("");
   const [markets,setMarkets]=useState<Market[]>([]);
+  const [shownFeedKey,setShownFeedKey]=useState("memes:trending:1h:");
+  const [fetching,setFetching]=useState(false);
   const requestSerial=useRef(0);
   const listScroll=useRef({top:0,left:0});
   const [catalog,setCatalog]=useState<Market[]>([]);
