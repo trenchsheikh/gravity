@@ -49,7 +49,7 @@ function TokenIcon({market,size=37}:{market:Pick<Market,"mint"|"image"|"symbol">
       }}/>:null}
   </span>;
 }
-function PriceChart({candles,loading,empty,source}: {candles:Candle[];loading:boolean;empty:string;source:string}){
+function PriceChart({candles,loading,empty}: {candles:Candle[];loading:boolean;empty:string}){
   if(loading&&!candles.length)return <div className="chart-empty"><LoaderCircle className="spin" size={23}/><span>Loading real market candles</span></div>;
   if(!candles.length)return <div className="chart-empty"><Activity size={22}/><span>{empty||"No recorded market candles are available yet."}</span><small>Only real market data is displayed. Try another interval or token.</small></div>;
   return <div className="chart-live gravity-interactive-chart"><MarketCandlestickChart candles={candles}/>{loading&&<span className="gravity-chart-refresh"><LoaderCircle className="spin" size={12}/> Updating</span>}</div>;
@@ -82,7 +82,6 @@ export default function Terminal(){
   const [cacheNotice,setCacheNotice]=useState("");
   const [pageVisible,setPageVisible]=useState(true);
   const [error,setError]=useState("");
-  const [provider,setProvider]=useState("");
   const [refreshed,setRefreshed]=useState<number|null>(null);
   const [tick,setTick]=useState(0);
   const [side,setSide]=useState<"long"|"short">("long");
@@ -93,7 +92,6 @@ export default function Terminal(){
   const [toast,setToast]=useState("");
   const [candles,setCandles]=useState<Candle[]>([]);
   const [chartInterval,setChartInterval]=useState<ChartInterval>("1m");
-  const [chartSource,setChartSource]=useState("");
   const [candlesLoading,setCandlesLoading]=useState(false);
   const [chartMessage,setChartMessage]=useState("Historical market data isn't available for this token yet.");
   const [processing,setProcessing]=useState(false);
@@ -132,7 +130,7 @@ export default function Terminal(){
       const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();if(signal?.aborted)return;
       if(!r.ok)throw Error(data.error||"Market feed temporarily unavailable");
       const list=(data.markets||[]) as Market[];
-      setMarkets(list);setProvider((data.providers||[]).join(" + "));setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
+      setMarkets(list);setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
       if(!query.trim())try{
         const oldCatalog=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]") as Market[];
         const seen=new Map<string,Market>();
@@ -163,11 +161,11 @@ export default function Terminal(){
     const prev=candleCache.get(key);
     if(prev?.candles.length){
       setCandles(prev.candles);
-      setChartSource(prev.source);
+      
       setCandlesLoading(false);
     }else{
       setCandles([]);
-      setChartSource("");
+      
       setCandlesLoading(true);
     }
     setChartMessage("Waiting for the token's real market history.");
@@ -187,9 +185,9 @@ export default function Terminal(){
         if(!active||request.signal.aborted)return;
         if(clean.length){
           candleCache.set(key,{candles:clean,source:response.source||"Market data",updated:Date.now()});
-          setCandles(clean);setChartSource(response.source||"Market data");
+          setCandles(clean);
         }else{
-          if(!candleCache.has(key)){setCandles([]);setChartSource("");}
+          if(!candleCache.has(key)){setCandles([]);}
           setChartMessage(response.error||"No historical trades recorded by the chart providers for this timeframe.");
         }
       }catch(error){
@@ -353,7 +351,7 @@ export default function Terminal(){
           <div className="gravity-detail-names"><span className="gravity-detail-category">{selected.category==="stock"?"Stock token":"Memecoin"} · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
           <div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div>
         </div>
-        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Live price history</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage} source={chartSource}/></div>
+        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Live price history</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage}/></div>
         <div className="gravity-compact-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} 24h volume</span><span>{selectedLastUpdated?"Updated "+new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting for market quote"}</span></div>
         <div className="gravity-inline-metrics">
           <div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div>

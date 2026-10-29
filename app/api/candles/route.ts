@@ -132,12 +132,12 @@ export async function GET(req:NextRequest) {
   const interval:Interval=Object.prototype.hasOwnProperty.call(OPTIONS,raw) ? raw as Interval : "1m";
   try {
     const candles=await birdeye(mint,interval);
-    if(candles.length>=1) return json({candles,source:"Birdeye",interval,updatedAt:Date.now(),marketAvailable:true});
+    if(candles.length>=1) return json({candles,source:"primary",interval,updatedAt:Date.now(),marketAvailable:true});
     const fallback=await gecko(mint,interval);
-    if(fallback.length>=1) return json({candles:fallback,source:"GeckoTerminal",interval,updatedAt:Date.now(),marketAvailable:true});
+    if(fallback.length>=1) return json({candles:fallback,source:"fallback",interval,updatedAt:Date.now(),marketAvailable:true});
     return json({
       candles:[],source:"none",interval,marketAvailable:false,updatedAt:Date.now(),
-      error:"No real historical trades or candles are available from Birdeye or the fallback provider for this token and interval. Try 1m or another timeframe."
+      error:"No price history is available for this token at the selected interval. Try another timeframe."
     });
   } catch {
     return json({

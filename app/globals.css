@@ -41,7 +41,7 @@
   .landing .hero-art{height:315px}
 }
 
-/* Brand refresh — transparent logo, illustration sprite and readable type. */
+/* Brand refresh  -  transparent logo, illustration sprite and readable type. */
 .brand{gap:9px}
 .brand-symbol,.brand-small .brand-symbol{width:44px;height:44px;border:none;border-radius:0;background:transparent;overflow:visible;display:grid;place-items:center;flex-shrink:0}
 .brand-symbol img{display:block;width:100%;height:100%;object-fit:contain;transform:none}
@@ -254,7 +254,7 @@
 @media(max-width:420px){.cinematic-artwork{height:260px}}
 
 
-/* Gravity v3 — focused, image-free orbital hero and comfortable responsive terminal. */
+/* Gravity v3  -  focused, image-free orbital hero and comfortable responsive terminal. */
 html{scrollbar-color:#46739b #0a0d11;scrollbar-width:thin}
 ::-webkit-scrollbar{width:11px;height:9px}
 ::-webkit-scrollbar-track{background:#0a0d11}
@@ -458,7 +458,7 @@ html{scrollbar-color:#46739b #0a0d11;scrollbar-width:thin}
 }
 @media(max-width:390px){.simple-hero h1{font-size:43px}.simple-hero-copy>p{font-size:15px}}
 
-/* Gravity V4 — midnight-blue / electric-blue identity */
+/* Gravity V4  -  midnight-blue / electric-blue identity */
 :root{--bg:#080e19;--surface:#0e1728;--surface2:#121e31;--surface3:#1a2a40;--stroke:#263c58;--muted:#98acc6;--faint:#7185a2;--text:#edf5ff;--lime:#71b9ff;--red:#f57a91}
 html{scrollbar-color:#397cb5 #09121f}
 ::-webkit-scrollbar-track{background:#09121f}
@@ -585,7 +585,7 @@ body{background:#080e19}
 }
 
 
-/* Gravity v5 — fixed, full-page animated mesh and reference-matched type. */
+/* Gravity v5  -  fixed, full-page animated mesh and reference-matched type. */
 body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 .gravity-landing{position:relative;isolation:isolate;background:#060c1a;overflow:visible}
 .gravity-landing>.shader-backdrop{position:fixed;inset:0;z-index:0;pointer-events:none;
@@ -1093,7 +1093,7 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 }
 
 
-/* Gravity compact token workspace — neutral navy surfaces, clean dividers and no metric cards. */
+/* Gravity compact token workspace  -  neutral navy surfaces, clean dividers and no metric cards. */
 .axiom-terminal:has(.gravity-compact-market){background:#080b13}
 .axiom-terminal .gravity-compact-market{color:#edf3ff;padding:7px 0 0;min-width:0}
 .axiom-terminal .gravity-compact-market .gravity-detail-navigation{min-height:38px;padding:0 0 9px;border-color:#233148}
@@ -1344,7 +1344,7 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 }
 
 
-/* Gravity real-time Birdeye candlesticks: more chart, less chrome. */
+/* Gravity real-time candlesticks: more chart, less chrome. */
 .axiom-terminal .gravity-compact-market .gravity-detail-grid {
   grid-template-columns:minmax(0,1fr) 305px;
   gap:15px;
@@ -1437,7 +1437,7 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 }
 
 
-/* Gravity two-market navigation: Pump.fun memes and StonkFun xStock assets. */
+/* Gravity two-market navigation. */
 .gravity-landing .gravity-hero-and{color:#8dc6ff;font-weight:400}
 .gravity-landing .simple-hero h1{font-size:clamp(43px,5.1vw,70px);line-height:1.15;letter-spacing:-.069em}
 .gravity-landing .simple-hero-copy>p{max-width:710px}

@@ -18,9 +18,9 @@ async function jupiter(path:string):Promise<unknown[]>{
     headers:{Accept:"application/json",...(KEY?{"x-api-key":KEY}:{})},
     next:{revalidate:20},signal:AbortSignal.timeout(8500)
   });
-  if(!res.ok)throw Error(res.status===429?"Jupiter market data is rate-limited. Retry shortly.":res.status===401||res.status===403?"Jupiter API credentials need attention.":"Jupiter market data temporarily unavailable.");
+  if(!res.ok)throw Error(res.status===429?"Market data is busy. Retry shortly.":res.status===401||res.status===403?"Market prices are temporarily unavailable.":"Market prices are temporarily unavailable.");
   const data:unknown=await res.json();
-  if(!Array.isArray(data))throw Error("Unexpected Jupiter token format");
+  if(!Array.isArray(data))throw Error("Unexpected market data format");
   return data;
 }
 function normalizeJupiter(data:unknown[],onlyPump:boolean):Market[]{
@@ -45,11 +45,11 @@ type StonkPair={mint:string;name:string;symbol:string;image:string|null;price:nu
 async function stockRegistry():Promise<StonkPair[]>{
   const url=STONK+"/pairs?category=xstock";
   const r=await fetch(url,{next:{revalidate:300},signal:AbortSignal.timeout(8500),headers:{Accept:"application/json"}});
-  if(!r.ok)throw Error("Stonk stock-token registry temporarily unavailable (HTTP "+r.status+").");
+  if(!r.ok)throw Error("Stock-token list is temporarily unavailable (HTTP "+r.status+").");
   const raw:unknown=await r.json();
   const root=asObj(raw),data=asObj(root.data);
   const rows=Array.isArray(data.pairs)?data.pairs:Array.isArray(root.pairs)?root.pairs:Array.isArray(raw)?raw:[];
-  if(!rows.length)throw Error("Stonk did not return any stock-token pairs.");
+  if(!rows.length)throw Error("No stock tokens are available right now.");
   const found=new Map<string,StonkPair>();
   for(const item of rows){
     const entry=asObj(item),quote=asObj(entry.quote),token=asObj(entry.token);
@@ -63,7 +63,7 @@ async function stockRegistry():Promise<StonkPair[]>{
     const value=numeric(entry.priceUsd)??numeric(entry.usdPrice)??numeric(market.priceUsd)??numeric(price.usd);
     found.set(mint,{mint,symbol:symbol.slice(0,24),name:name.slice(0,90),image:safeIcon(entry.logo)||safeIcon(entry.icon)||safeIcon(entry.logoURI)||safeIcon(quote.logo)||safeIcon(token.logo),price:value,category});
   }
-  if(!found.size)throw Error("Stonk registry returned no valid xStock mints.");
+  if(!found.size)throw Error("No matching stock-token addresses were returned.");
   return [...found.values()].slice(0,100);
 }
 async function stockMarkets(query:string):Promise<Market[]>{
@@ -103,20 +103,20 @@ export async function GET(request:NextRequest){
       const list=await stockMarkets(query);
       if(tab==="trending")list.sort((a,b)=>(b.marketCap??-1)-(a.marketCap??-1));
       else list.sort((a,b)=>a.symbol.localeCompare(b.symbol));
-      return response({markets:list.slice(0,100),providers:["StonkFun registry","Jupiter Tokens V2"],updatedAt:Date.now(),market,tab,window});
+      return response({markets:list.slice(0,100),updatedAt:Date.now(),market,tab,window});
     }
     if(query){
       const listed=normalizeJupiter(await jupiter("/search?query="+encodeURIComponent(query)),!isMint(query));
       return response({markets:(isMint(query)?listed.filter(m=>m.mint===query):listed).slice(0,30),
-        providers:["Jupiter Tokens V2"],updatedAt:Date.now(),market,query});
+        updatedAt:Date.now(),market,query});
     }
     const endpoint=tab==="new"?"/recent":"/toptrending/"+window+"?limit=100";
     const listed=normalizeJupiter(await jupiter(endpoint),true);
     if(tab==="new")listed.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
     else listed.sort((a,b)=>(b.volume24h||0)-(a.volume24h||0));
-    return response({markets:listed.slice(0,80),providers:["Jupiter Tokens V2"],updatedAt:Date.now(),market,tab,window});
+    return response({markets:listed.slice(0,80),updatedAt:Date.now(),market,tab,window});
   }catch(error){
     const message=error instanceof Error?error.message:"Market data temporarily unavailable.";
-    return response({markets:[],providers:market==="stocks"?["StonkFun registry","Jupiter Tokens V2"]:["Jupiter Tokens V2"],error:message,market},503);
+    return response({markets:[],error:message,market},503);
   }
 }
