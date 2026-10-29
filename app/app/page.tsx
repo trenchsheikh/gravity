@@ -77,7 +77,7 @@ export default function Terminal(){
   const [shownFeedKey,setShownFeedKey]=useState("memes:trending:1h:");
   const [fetching,setFetching]=useState(false);
   const requestSerial=useRef(0);
-  const listScroll=useRef({top:0,left:0});
+  const listScroll=useRef({top:0,left:0,listTop:0});
   const [catalog,setCatalog]=useState<Market[]>([]);
   const [selected,setSelected]=useState<Market|null>(null);
   const [loading,setLoading]=useState(true);
@@ -95,6 +95,7 @@ export default function Terminal(){
   const [prices,setPrices]=useState<Record<string,number>>({});
   const [toast,setToast]=useState("");
   const [candles,setCandles]=useState<Candle[]>([]);
+  const [chartKey,setChartKey]=useState("");
   const [chartInterval,setChartInterval]=useState<ChartInterval>("1m");
   const [candlesLoading,setCandlesLoading]=useState(false);
   const [chartMessage,setChartMessage]=useState("Historical market data isn't available for this token yet.");
@@ -126,7 +127,7 @@ export default function Terminal(){
     setMarkets(saved?.markets||[]);
     setShownFeedKey(saved?activeFeedKey:"");
     setCacheTime(saved?.time||null);
-    setCacheNotice(saved?"Updating saved markets":"");
+    setCacheNotice("");
     setLoading(!saved);setError("");
   },[activeFeedKey,marketType,tab,windowSize,query]);
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),4500);return()=>clearTimeout(id)},[toast]);
@@ -168,6 +169,7 @@ export default function Terminal(){
     let active=true;
     let controller:AbortController|null=null;
     const prev=candleCache.get(key);
+    setChartKey(key);
     if(prev?.candles.length){
       setCandles(prev.candles);
       
@@ -210,14 +212,14 @@ export default function Terminal(){
   },[tradeOpen,selected?.mint,chartInterval,pageVisible]);
   useEffect(()=>{
     const mints=[...new Set(positions.filter(p=>!p.closedAt).map(p=>p.mint))].slice(0,10);
-    if(!mints.length)return;
+    if(!mints.length||!pageVisible)return;
     let cancelled=false;
     const refresh=async()=>{
       const found=await Promise.all(mints.map(async mint=>{try{const r=await fetch(`/api/markets?q=${mint}`,{cache:"no-store"});if(!r.ok)return null;const d=await r.json();const m=d.markets?.find((m:Market)=>m.mint===mint&&m.priceUsd!=null&&m.priceUsd>0);return m?[mint,m.priceUsd] as const:null}catch{return null}}));
       if(!cancelled)setPrices(prev=>({...prev,...Object.fromEntries(found.filter(Boolean) as (readonly [string,number])[])}));
     };
     void refresh();const timer=setInterval(refresh,15000);return()=>{cancelled=true;clearInterval(timer)};
-  },[positions]);
+  },[positions,pageVisible]);
 
   useEffect(()=>{
     if(!tradeOpen||!selected?.mint||!pageVisible)return;
@@ -257,7 +259,7 @@ export default function Terminal(){
     }catch{}
     setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);
     setQuery("");setMarkets(cached?.markets||[]);setShownFeedKey(cached?next+":"+tab+":"+windowSize+":":"");setLoading(!cached);
-    setError("");setCacheNotice(cached?"Updating saved markets":"");
+    setError("");setCacheNotice("");
     setRefreshed(cached?.time||null);setCacheTime(cached?.time||null);
   };
   const showWatchlist=()=>{
@@ -277,7 +279,7 @@ export default function Terminal(){
   const openTrade=(m:Market)=>{
     requestSerial.current++;
     const list=document.querySelector(".axiom-list-scroll");
-    listScroll.current={top:window.scrollY,left:list?.scrollLeft||0};
+    listScroll.current={top:window.scrollY,left:list?.scrollLeft||0,listTop:list?.scrollTop||0};
     setSelected(m);setDetailTab("overview");setSelectedLastUpdated(null);
     setTradeOpen(true);setMobileTrading(true);
     window.scrollTo({top:0,behavior:"instant"});
@@ -286,7 +288,7 @@ export default function Terminal(){
     setTradeOpen(false);setMobileTrading(false);
     requestAnimationFrame(()=>{
       const list=document.querySelector(".axiom-list-scroll");
-      if(list)list.scrollLeft=listScroll.current.left;
+      if(list){list.scrollLeft=listScroll.current.left;list.scrollTop=listScroll.current.listTop;}
       window.scrollTo({top:listScroll.current.top,behavior:"instant"});
     });
   };
@@ -304,6 +306,9 @@ export default function Terminal(){
   }catch(e){setToast((e as Error).message)}finally{setProcessing(false)}}
   function closePaper(p:Position){const mark=prices[p.mint];if(!mark){setToast("Current market price unavailable. Cannot close yet.");return}try{const next=positions.map(x=>x.id===p.id?closePosition(x,mark):x);setPositions(next);storePositions(next);setToast(`Position on ${p.symbol} closed.`)}catch(e){setToast((e as Error).message)}}
   const selectedActive=selected && open.filter(p=>p.mint===selected.mint).length;
+  const currentChartKey=selected?selected.mint+":"+chartInterval:"";
+  const activeCandles=chartKey===currentChartKey?candles:(candleCache.get(currentChartKey)?.candles||[]);
+  const activeChartLoading=candlesLoading||(chartKey!==currentChartKey&&!activeCandles.length);
   return <div className="terminal-shell axiom-terminal">
     <header className="axiom-header">
       <div className="axiom-header-left">
@@ -400,7 +405,7 @@ export default function Terminal(){
           <div className="gravity-detail-names"><span className="gravity-detail-category">{selected.category==="stock"?"Stock token":"Memecoin"} · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
           <div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div>
         </div>
-        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Live price history</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage}/></div>
+        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Live price history</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart key={currentChartKey} candles={activeCandles} loading={activeChartLoading} empty={chartMessage}/></div>
         <div className="gravity-compact-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} 24h volume</span><span>{selectedLastUpdated?"Updated "+new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting for market quote"}</span></div>
         <div className="gravity-inline-metrics">
           <div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div>
