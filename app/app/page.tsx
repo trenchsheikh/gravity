@@ -130,14 +130,16 @@ export default function Terminal(){
     setLoading(!saved);setError("");
   },[activeFeedKey,marketType,tab,windowSize,query]);
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),4500);return()=>clearTimeout(id)},[toast]);
-  const fetchMarkets=useCallback(async(signal?:AbortSignal)=>{
-    setError("");
+  const fetchMarkets=useCallback(async(signal:AbortSignal)=>{
+    const serial=++requestSerial.current;
+    const current=()=>!signal.aborted&&serial===requestSerial.current;
+    setFetching(true);
     try {
       const params=new URLSearchParams({tab,window:windowSize,market:marketType});if(query.trim())params.set("q",query.trim());
-      const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();if(signal?.aborted)return;
+      const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();if(!current())return;
       if(!r.ok)throw Error(data.error||"Market feed temporarily unavailable");
       const list=(data.markets||[]) as Market[];
-      setMarkets(list);setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
+      setMarkets(list);setShownFeedKey(activeFeedKey);setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");setError("");
       if(!query.trim())try{
         const oldCatalog=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]") as Market[];
         const seen=new Map<string,Market>();
@@ -154,10 +156,10 @@ export default function Terminal(){
       }catch{}
       setSelected(current=>{if(!current)return list[0]||null;return list.find(m=>m.mint===current.mint)||current});
       setPrices(old=>({...old,...Object.fromEntries(list.filter(m=>m.priceUsd!=null&&m.priceUsd>0).map(m=>[m.mint,m.priceUsd!]))}));
-    } catch(e){if((e as Error).name!=="AbortError"){const msg=e instanceof Error?e.message:"Could not load markets";setError(msg);setCacheNotice(msg)}}finally{if(!signal?.aborted)setLoading(false)}
-  },[tab,query,windowSize,marketType]);
-  useEffect(()=>{const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query?450:0);return()=>{clearTimeout(timeout);c.abort()}},[fetchMarkets,tick]);
-  useEffect(()=>{if(!pageVisible)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible]);
+    } catch(e){if(current()){const msg=e instanceof Error?e.message:"Could not load markets";setError(msg);setCacheNotice(msg)}}finally{if(current()){setLoading(false);setFetching(false)}}
+  },[tab,query,windowSize,marketType,activeFeedKey]);
+  useEffect(()=>{if(!pageVisible||view!=="markets"||tradeOpen||watchOnly)return;const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query.trim()?350:0);return()=>{clearTimeout(timeout);c.abort();requestSerial.current++}},[fetchMarkets,tick,pageVisible,view,tradeOpen,watchOnly]);
+  useEffect(()=>{if(!pageVisible||view!=="markets"||tradeOpen||watchOnly)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible,view,tradeOpen,watchOnly]);
   useEffect(()=>{if(pageVisible)setTick(x=>x+1)},[pageVisible]);
   useEffect(()=>{
     if(!tradeOpen||!selected?.mint||!pageVisible)return;
