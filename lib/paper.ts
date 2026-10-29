@@ -28,7 +28,7 @@ export function lockedMargin(positions:Position[]) {return positions.filter(p=>!
 export function freeBalance(positions:Position[]) {return Math.max(0,STARTING_BALANCE+realisedPnl(positions)-lockedMargin(positions))}
 export function newPosition(m:Market,side:"long"|"short",margin:number,leverage:number,positions:Position[]):Position {
   if (!m.priceUsd || !Number.isFinite(m.priceUsd) || m.priceUsd<=0) throw new Error("A verified live price is required before opening a paper trade.");
-  if (!Number.isFinite(margin) || margin < 5 || margin > 1000 || margin > freeBalance(positions)) throw new Error("Enter $5–$1,000 within your available paper balance.");
+  if (!Number.isFinite(margin) || margin < 5 || margin > 1000 || margin > freeBalance(positions)) throw new Error("Enter $5 to $1,000 within your available paper balance.");
   if (![1,2,3].includes(leverage)) throw new Error("Unsupported leverage.");
   return {id:crypto.randomUUID(),mint:m.mint,name:m.name,symbol:m.symbol,image:m.image,side,margin,leverage,entry:m.priceUsd,openedAt:Date.now()};
 }

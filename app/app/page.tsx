@@ -15,15 +15,15 @@ type ChartInterval="1m"|"5m"|"15m"|"1H"|"4H"|"1D";
 const INTERVALS:ChartInterval[]=["1m","5m","15m","1H","4H","1D"];
 const candleCache=new Map<string,{candles:Candle[];source:string;updated:number}>();
 function dollar(n:number|null|undefined,compact=false){
-  if(n==null || !Number.isFinite(n)) return "—";
+  if(n==null || !Number.isFinite(n)) return "N/A";
   if(compact) return "$"+new Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:1}).format(n);
   if(n===0) return "$0.00";
   if(Math.abs(n)<0.0001) return "$"+n.toPrecision(3);
   if(Math.abs(n)<1) return "$"+n.toFixed(5);
   return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
-function change(n:number|null|undefined){return n==null ? "—" : `${n>0?"+":""}${n.toFixed(2)}%`}
-function relative(t:number|null){if(!t)return "—";let ms=Date.now()-t;if(ms<0)return "just now";if(ms<3600000)return `${Math.floor(ms/60000)}m`;if(ms<86400000)return `${Math.floor(ms/3600000)}h`;return `${Math.floor(ms/86400000)}d`}
+function change(n:number|null|undefined){return n==null ? "N/A" : `${n>0?"+":""}${n.toFixed(2)}%`}
+function relative(t:number|null){if(!t)return "N/A";let ms=Date.now()-t;if(ms<0)return "just now";if(ms<3600000)return `${Math.floor(ms/60000)}m`;if(ms<86400000)return `${Math.floor(ms/3600000)}h`;return `${Math.floor(ms/86400000)}d`}
 // Cache broken original URLs so refreshes never restart the same failed image.
 const failedTokenImages=new Set<string>();
 const logoFallbacks=new Map<string,string>();
@@ -52,7 +52,7 @@ function TokenIcon({market,size=37}:{market:Pick<Market,"mint"|"image"|"symbol">
 function PriceChart({candles,loading,empty,source}: {candles:Candle[];loading:boolean;empty:string;source:string}){
   if(loading&&!candles.length)return <div className="chart-empty"><LoaderCircle className="spin" size={23}/><span>Loading real market candles</span></div>;
   if(!candles.length)return <div className="chart-empty"><Activity size={22}/><span>{empty||"No recorded market candles are available yet."}</span><small>Only real market data is displayed. Try another interval or token.</small></div>;
-  return <div className="chart-live gravity-interactive-chart"><MarketCandlestickChart candles={candles}/>{loading&&<span className="gravity-chart-refresh"><LoaderCircle className="spin" size={12}/> Updating</span>}<span className="gravity-chart-provider">{source}</span></div>;
+  return <div className="chart-live gravity-interactive-chart"><MarketCandlestickChart candles={candles}/>{loading&&<span className="gravity-chart-refresh"><LoaderCircle className="spin" size={12}/> Updating</span>}</div>;
 }
 
 function SolanaGlyph({size=19}:{size?:number}){
@@ -61,7 +61,7 @@ function SolanaGlyph({size=19}:{size?:number}){
     <path d="M5 3h19l-4 4H1l4-4Zm-4 7h19l4 4H5l-4-4Zm4 7h19l-4 4H1l4-4Z" fill="url(#sol-gradient)"/>
   </svg>;
 }
-function compactNum(n:number|null|undefined){if(n===null||n===undefined||!Number.isFinite(n))return "—";return Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:1}).format(n)}
+function compactNum(n:number|null|undefined){if(n===null||n===undefined||!Number.isFinite(n))return "N/A";return Intl.NumberFormat("en-US",{notation:"compact",maximumFractionDigits:1}).format(n)}
 function windowChange(m:Market,window:"5m"|"1h"|"6h"|"24h"){return window==="5m"?m.change5m:window==="1h"?m.change1h:window==="6h"?m.change6h:m.change24h}
 function windowVolume(m:Market,window:"5m"|"1h"|"6h"|"24h"){return window==="5m"?m.volume5m:window==="1h"?m.volume1h:window==="6h"?m.volume6h:m.volume24h}
 
@@ -120,7 +120,7 @@ export default function Terminal(){
       const item=all[marketType+":"+tab+":"+windowSize];
       if(item&&Array.isArray(item.markets)&&Number.isFinite(item.time)&&Date.now()-item.time<6*3600000){
         setMarkets(item.markets.slice(0,120));setCacheTime(item.time);setLoading(false);
-        setCacheNotice("Cached market list — refreshing");
+        setCacheNotice("Showing cached markets. Refreshing now.");
       }
     }catch{}
   },[tab,windowSize,query,marketType]);
@@ -129,7 +129,7 @@ export default function Terminal(){
     setError("");
     try {
       const params=new URLSearchParams({tab,window:windowSize,market:marketType});if(query.trim())params.set("q",query.trim());
-      const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();
+      const r=await fetch(`/api/markets?${params}`,{signal,cache:"no-store"});const data=await r.json();if(signal?.aborted)return;
       if(!r.ok)throw Error(data.error||"Market feed temporarily unavailable");
       const list=(data.markets||[]) as Market[];
       setMarkets(list);setProvider((data.providers||[]).join(" + "));setRefreshed(Date.now());setCacheTime(Date.now());setCacheNotice("");
@@ -239,7 +239,7 @@ export default function Terminal(){
   },[markets,catalog,watchOnly,watchlist,tab,marketType,query,sortBy,windowSize]);
   const selectMarket=(next:"memes"|"stocks")=>{
     setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);
-    setQuery("");setMarkets([]);setLoading(true);setError("");setCacheNotice("");
+    setQuery("");setMarkets([]);setLoading(true);setError("");setCacheNotice("");setRefreshed(null);setCacheTime(null);
   };
   const openTrade=(m:Market)=>{setSelected(m);setDetailTab("overview");setSelectedLastUpdated(null);setTradeOpen(true);setMobileTrading(true);window.scrollTo({top:0,behavior:"instant"})};
   const hideTrade=()=>{setTradeOpen(false);setMobileTrading(false)};
@@ -255,7 +255,7 @@ export default function Terminal(){
     const position=newPosition({...selected,priceUsd:currentPrice},side,Number(margin),lev,positions);
     const next=[position,...positions];setPositions(next);storePositions(next);setToast(`${side.toUpperCase()} position opened on ${selected.symbol} with virtual funds.`);
   }catch(e){setToast((e as Error).message)}finally{setProcessing(false)}}
-  function closePaper(p:Position){const mark=prices[p.mint];if(!mark){setToast("Current market price unavailable — cannot close yet.");return}try{const next=positions.map(x=>x.id===p.id?closePosition(x,mark):x);setPositions(next);storePositions(next);setToast(`Position on ${p.symbol} closed.`)}catch(e){setToast((e as Error).message)}}
+  function closePaper(p:Position){const mark=prices[p.mint];if(!mark){setToast("Current market price unavailable. Cannot close yet.");return}try{const next=positions.map(x=>x.id===p.id?closePosition(x,mark):x);setPositions(next);storePositions(next);setToast(`Position on ${p.symbol} closed.`)}catch(e){setToast((e as Error).message)}}
   const selectedActive=selected && open.filter(p=>p.mint===selected.mint).length;
   return <div className="terminal-shell axiom-terminal">
     <header className="axiom-header">
@@ -263,7 +263,7 @@ export default function Terminal(){
         <Brand small/>
         <nav className="axiom-primary-nav" aria-label="App navigation">
  <button className={view==="markets"&&marketType==="memes"&&!watchOnly?"active":""} onClick={()=>selectMarket("memes")}>Memecoins</button>
- <button className={view==="markets"&&marketType==="stocks"&&!watchOnly?"active":""} onClick={()=>selectMarket("stocks")}>Stock tokens <span className="axiom-stonk-mark">STONK</span></button>
+ <button className={view==="markets"&&marketType==="stocks"&&!watchOnly?"active":""} onClick={()=>selectMarket("stocks")}>Stock tokens </button>
  <button className={view==="markets"&&watchOnly?"active":""} onClick={()=>{setView("markets");setWatchOnly(true);setTradeOpen(false)}}>Watchlist</button>
  <button className={view==="positions"?"active":""} onClick={()=>setView("positions")}>Portfolio <span className="axiom-nav-count">{open.length}</span></button>
  </nav>
@@ -275,7 +275,7 @@ export default function Terminal(){
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
       </div>
     </header>
-    <div className="axiom-utility"><div><ShieldCheck size={14}/> VIRTUAL FUNDS ONLY · NO REAL ORDERS <span>·</span> {marketType==="stocks"?"StonkFun + Jupiter":"Jupiter"} market data</div><div><span className="axiom-status-dot"/>{cacheNotice?"Using cached data":refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"—"}</div></div>
+    <div className="axiom-utility"><div><ShieldCheck size={14}/> VIRTUAL FUNDS ONLY · NO REAL ORDERS <span>·</span> Market data</div><div><span className="axiom-status-dot"/>{cacheNotice?"Using cached data":refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"N/A"}</div></div>
     <main className="axiom-main">
       <div className="axiom-workspace">
         <div className="axiom-mobile-search"><Search size={16}/><input value={query} onChange={e=>{setQuery(e.target.value);setView("markets")}} placeholder="Search token or contract address"/></div>
@@ -284,7 +284,7 @@ export default function Terminal(){
           <div className="axiom-section-bar">
             <div className="axiom-section-tabs">
  <button className={!watchOnly&&tab==="trending"?"current":""} onClick={()=>{setTab("trending");setWatchOnly(false)}}>{marketType==="stocks"?"Top stocks":"Top"}</button>
- <button className={!watchOnly&&tab==="new"?"current":""} onClick={()=>{setTab("new");setWatchOnly(false)}}>{marketType==="stocks"?"A–Z":"New"}</button>
+ <button className={!watchOnly&&tab==="new"?"current":""} onClick={()=>{setTab("new");setWatchOnly(false)}}>{marketType==="stocks"?"A to Z":"New"}</button>
  <button className={watchOnly?"current":""} onClick={()=>setWatchOnly(true)}>Watchlist <span>{watchlist.length}</span></button>
  </div>
             <div className="axiom-table-tools">
@@ -297,7 +297,7 @@ export default function Terminal(){
           {cacheNotice&&<div className="gravity-cache-banner"><Activity size={15}/><span>{markets.length?"Showing available cached markets. ":""}{cacheNotice}</span></div>}
           <div className="axiom-list-container">
             <div className="axiom-list-topline">
-              <div><SolanaGlyph size={20}/><strong>{marketType==="stocks"?"STOCK TOKENS":"MEMECOINS"}</strong><span className="axiom-source-pill">{marketType==="stocks"?"STONK × JUPITER":"JUPITER DATA"}</span><span className="axiom-list-count">{visible.length} tokens</span><span className="gravity-cache-time">{cacheTime?"Synced "+new Date(cacheTime).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):""}</span></div>
+              <div><SolanaGlyph size={20}/><strong>{marketType==="stocks"?"STOCK TOKENS":"MEMECOINS"}</strong><span className="axiom-source-pill">"GRAVITY MARKETS"</span><span className="axiom-list-count">{visible.length} tokens</span><span className="gravity-cache-time">{cacheTime?"Synced "+new Date(cacheTime).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):""}</span></div>
               <div className="axiom-ordering"><label htmlFor="gravity-sort">Sort by</label><select id="gravity-sort" value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)}>
                 <option value="cap">Market cap</option><option value="liquidity">Liquidity</option><option value="volume">Volume</option><option value="change">Price change</option>
               </select></div>
@@ -312,21 +312,21 @@ export default function Terminal(){
                   const move=windowChange(m,windowSize);
                   const hasMove=move!==null&&Number.isFinite(move);
                   const buys=m.buys24h,sells=m.sells24h;
-                  return <div className="axiom-row axiom-cols" key={m.mint} role="button" tabIndex={0} aria-label={"Open paper trading for "+m.name} onClick={()=>openTrade(m)} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openTrade(m)}}}>
+                  return <div className="axiom-row axiom-cols" key={m.mint} role="button" tabIndex={0} aria-label={"Open market details for "+m.name} onClick={()=>openTrade(m)} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();openTrade(m)}}}>
                     <div className="axiom-pair">
                       <div className="axiom-token-icon"><TokenIcon market={m} size={44}/><span className="axiom-chain-mini"><SolanaGlyph size={11}/></span></div>
-                      <div className="axiom-pair-content"><div><strong>{m.symbol}</strong><span>{m.name}</span>{m.isVerified&&<span className="axiom-verified" title="Jupiter verified">✓</span>}</div>
-                        <div className="axiom-pair-meta"><span className="axiom-age">{m.category==="stock"?"xStock":relative(m.createdAt)}</span><span>{dollar(m.priceUsd)}</span><span className={m.isSuspicious?"text-down":"axiom-safe"}>{m.isSuspicious?"Flagged":m.category==="stock"?"StonkFun":"On Solana"}</span></div>
+                      <div className="axiom-pair-content"><div><strong>{m.symbol}</strong><span>{m.name}</span>{m.isVerified&&<span className="axiom-verified" title="Verified token">✓</span>}</div>
+                        <div className="axiom-pair-meta"><span className="axiom-age">{m.category==="stock"?"xStock":relative(m.createdAt)}</span><span>{dollar(m.priceUsd)}</span><span className={m.isSuspicious?"text-down":"axiom-safe"}>{m.isSuspicious?"Flagged":m.category==="stock"?"Stock token":"On Solana"}</span></div>
                       </div>
                     </div>
                     <div className="axiom-cap"><strong>{dollar(m.marketCap,true)}</strong><span className={hasMove?(move!>=0?"text-up":"text-down"):"axiom-muted"}>{change(move)}</span><span className={"axiom-change-meter "+(hasMove&&move!<0?"negative":"")} title={hasMove?"Price change for "+windowSize+": "+change(move):"Price change unavailable"}><i style={{width:hasMove?Math.min(100,Math.abs(move!)*2+5)+"%":"0%"}}/></span></div>
                     <div className="axiom-value">{dollar(m.liquidityUsd,true)}</div>
                     <div className="axiom-value">{dollar(windowVolume(m,windowSize),true)}</div>
-                    <div className="axiom-txn"><strong>{buys!==null||sells!==null?compactNum((buys||0)+(sells||0)):"—"}</strong><span><b className="text-up">{compactNum(buys)}</b> / <b className="text-down">{compactNum(sells)}</b></span></div>
+                    <div className="axiom-txn"><strong>{buys!==null||sells!==null?compactNum((buys||0)+(sells||0)):"N/A"}</strong><span><b className="text-up">{compactNum(buys)}</b> / <b className="text-down">{compactNum(sells)}</b></span></div>
                     <div className="axiom-info">
                       <span className={m.isSuspicious?"axiom-risk-flag":m.isVerified?"axiom-risk-ok":"axiom-risk-neutral"}>{m.isSuspicious?"⚠ Flagged":m.isVerified?"✓ Verified":"Unverified"}</span>
                       <span>Holders <b>{compactNum(m.holderCount)}</b></span>
-                      <span>Organic <b>{m.organicScore===null?"—":m.organicScore.toFixed(0)+"/100"}</b></span>
+                      <span>Organic <b>{m.organicScore===null?"N/A":m.organicScore.toFixed(0)+"/100"}</b></span>
                     </div>
                     <div className="axiom-action-buttons">
                       <button type="button" className="axiom-trade-btn" onClick={e=>{e.stopPropagation();openTrade(m)}}>Trade</button>
@@ -350,10 +350,10 @@ export default function Terminal(){
       <div className="gravity-detail-primary">
         <div className="gravity-detail-heading">
           <TokenIcon market={selected} size={43}/>
-          <div className="gravity-detail-names"><span className="gravity-detail-category">{selected.category==="stock"?"Stock token · StonkFun":"Memecoin · Pump.fun"} · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
+          <div className="gravity-detail-names"><span className="gravity-detail-category">{selected.category==="stock"?"Stock token":"Memecoin"} · {selected.isVerified?"Verified":"Unverified"} · {relative(selected.createdAt)}</span><h1>{selected.name} <small>{selected.symbol}</small></h1></div>
           <div className="gravity-detail-price"><strong>{dollar(currentPrice)}</strong><span className={(selected.change24h??0)>=0?"text-up":"text-down"}>{change(selected.change24h)} <small>24h</small></span></div>
         </div>
-        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Real OHLCV · {chartSource||"Birdeye"}</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage} source={chartSource}/></div>
+        <div className="gravity-detail-chart"><div className="gravity-detail-chart-top"><div className="gravity-chart-label"><strong>Price · USD</strong><span>Live price history</span></div><div className="gravity-chart-timeframes" role="group" aria-label="Chart timeframe">{INTERVALS.map(interval=><button key={interval} onClick={()=>setChartInterval(interval)} aria-pressed={chartInterval===interval} className={chartInterval===interval?"active":""}>{interval}</button>)}</div></div><PriceChart candles={candles} loading={candlesLoading} empty={chartMessage} source={chartSource}/></div>
         <div className="gravity-compact-chart-footer"><span><Activity size={14}/> {dollar(selected.volume24h,true)} 24h volume</span><span>{selectedLastUpdated?"Updated "+new Date(selectedLastUpdated).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit",second:"2-digit"}):"Waiting for market quote"}</span></div>
         <div className="gravity-inline-metrics">
           <div><span>Market cap</span><strong>{dollar(selected.marketCap,true)}</strong></div>
@@ -371,14 +371,14 @@ export default function Terminal(){
           {detailTab==="overview"?<div className="gravity-compact-overview">
             <span className="gravity-compact-subtitle">Price change</span>
             {(["5m","1h","6h","24h"] as const).map(w=><div key={w}><span>{w}</span><strong className={(windowChange(selected,w)??0)>=0?"text-up":"text-down"}>{change(windowChange(selected,w))}</strong></div>)}
-            <span className="gravity-compact-score">Organic score <strong>{selected.organicScore==null?"—":selected.organicScore.toFixed(0)+"/100"}</strong></span>
+            <span className="gravity-compact-score">Organic score <strong>{selected.organicScore==null?"N/A":selected.organicScore.toFixed(0)+"/100"}</strong></span>
           </div>:detailTab==="positions"?<div className="gravity-compact-positions">
-            {open.filter(p=>p.mint===selected.mint).length===0?<span>No open positions for this token.</span>:open.filter(p=>p.mint===selected.mint).map(p=><div className="gravity-compact-position" key={p.id}><strong className={p.side==="long"?"text-up":"text-down"}>{p.side.toUpperCase()} {p.leverage}×</strong><span>{dollar(p.margin)} margin</span><strong className={currentPrice&&getPnl(p,currentPrice)>=0?"text-up":"text-down"}>{currentPrice?(getPnl(p,currentPrice)>=0?"+":"−")+dollar(Math.abs(Math.max(-p.margin,getPnl(p,currentPrice)))):"—"}</strong><button disabled={!quoteFresh} onClick={()=>closePaper(p)}>Close</button></div>)}
+            {open.filter(p=>p.mint===selected.mint).length===0?<span>No open positions for this token.</span>:open.filter(p=>p.mint===selected.mint).map(p=><div className="gravity-compact-position" key={p.id}><strong className={p.side==="long"?"text-up":"text-down"}>{p.side.toUpperCase()} {p.leverage}×</strong><span>{dollar(p.margin)} margin</span><strong className={currentPrice&&getPnl(p,currentPrice)>=0?"text-up":"text-down"}>{currentPrice?(getPnl(p,currentPrice)>=0?"+":"−")+dollar(Math.abs(Math.max(-p.margin,getPnl(p,currentPrice)))):"N/A"}</strong><button disabled={!quoteFresh} onClick={()=>closePaper(p)}>Close</button></div>)}
           </div>:<div className="gravity-compact-info">
             <div><span>Contract</span><button onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}>{selected.mint.slice(0,10)}…{selected.mint.slice(-7)} <CopyIcon/></button></div>
             <div><span>Network</span><strong><SolanaGlyph size={14}/> Solana</strong></div>
             <div><span>Verification</span><strong>{selected.isVerified?"Verified":"Unverified"}</strong></div>
-            <div><span>Risk flag</span><strong className={selected.isSuspicious?"text-down":""}>{selected.isSuspicious?"Flagged":"No Jupiter flag"}</strong></div>
+            <div><span>Risk flag</span><strong className={selected.isSuspicious?"text-down":""}>{selected.isSuspicious?"Flagged":"No flag reported"}</strong></div>
           </div>}
         </div>
       </div>
@@ -389,10 +389,10 @@ export default function Terminal(){
       </aside>
     </div>
   </section>}
-        </>:<div className="portfolio-layout"><div className="portfolio-summary"><div className="portfolio-hero"><span>VIRTUAL EQUITY</span><strong>{dollar(equity)}</strong><small>Not a real wallet balance</small></div><div><span>AVAILABLE COLLATERAL</span><strong>{dollar(freeBalance(positions))}</strong></div><div><span>LOCKED COLLATERAL</span><strong>{dollar(lockedMargin(positions))}</strong></div><div><span>REALIZED P&L</span><strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></div></div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Open positions <span className="subtle-count">{open.length}</span></span><span className="position-note">MARKS REFRESH EVERY ~15S</span></div>{open.length===0?<div className="feed-message position-empty"><Wallet size={24}/><strong>No open paper positions</strong><span>Find a token and choose long or short.</span><button onClick={()=>setView("markets")} className="pill pill-outline">Browse markets</button></div>:<div className="positions-list">{open.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>MARK</small><strong>{dollar(prices[p.mint])}</strong></div><div><small>UNREALIZED P&L</small><strong className={!prices[p.mint]?"":getPnl(p,prices[p.mint])>=0?"text-up":"text-down"}>{prices[p.mint]?`${getPnl(p,prices[p.mint])>=0?"+":"−"}${dollar(Math.abs(Math.max(-p.margin,getPnl(p,prices[p.mint]))))}`:"—"}</strong></div><button className="pill pill-outline position-close" disabled={!prices[p.mint]} onClick={()=>closePaper(p)}>Close</button></div>)}</div>}</div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Trade history <span className="subtle-count">{closed.length}</span></span></div>{closed.length===0?<div className="history-empty">Your closed positions will appear here.</div>:<div className="positions-list">{closed.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>EXIT</small><strong>{dollar(p.exit)}</strong></div><div><small>REALIZED P&L</small><strong className={(p.pnl||0)>=0?"text-up":"text-down"}>{(p.pnl||0)>=0?"+":"−"}{dollar(Math.abs(p.pnl||0))}</strong></div><span className="closed-tag"><Check size={14}/> CLOSED</span></div>)}</div>}</div><div className="portfolio-fineprint"><CircleHelp size={16}/> Indicative P&L excludes fees, slippage, and funding. Virtual funds only, no real orders. Browser storage only.</div></div>}
+        </>:<div className="portfolio-layout"><div className="portfolio-summary"><div className="portfolio-hero"><span>VIRTUAL EQUITY</span><strong>{dollar(equity)}</strong><small>Not a real wallet balance</small></div><div><span>AVAILABLE COLLATERAL</span><strong>{dollar(freeBalance(positions))}</strong></div><div><span>LOCKED COLLATERAL</span><strong>{dollar(lockedMargin(positions))}</strong></div><div><span>REALIZED P&L</span><strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></div></div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Open positions <span className="subtle-count">{open.length}</span></span><span className="position-note">MARKS REFRESH EVERY ~15S</span></div>{open.length===0?<div className="feed-message position-empty"><Wallet size={24}/><strong>No open paper positions</strong><span>Find a token and choose long or short.</span><button onClick={()=>setView("markets")} className="pill pill-outline">Browse markets</button></div>:<div className="positions-list">{open.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>MARK</small><strong>{dollar(prices[p.mint])}</strong></div><div><small>UNREALIZED P&L</small><strong className={!prices[p.mint]?"":getPnl(p,prices[p.mint])>=0?"text-up":"text-down"}>{prices[p.mint]?`${getPnl(p,prices[p.mint])>=0?"+":"−"}${dollar(Math.abs(Math.max(-p.margin,getPnl(p,prices[p.mint]))))}`:"N/A"}</strong></div><button className="pill pill-outline position-close" disabled={!prices[p.mint]} onClick={()=>closePaper(p)}>Close</button></div>)}</div>}</div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Trade history <span className="subtle-count">{closed.length}</span></span></div>{closed.length===0?<div className="history-empty">Your closed positions will appear here.</div>:<div className="positions-list">{closed.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>EXIT</small><strong>{dollar(p.exit)}</strong></div><div><small>REALIZED P&L</small><strong className={(p.pnl||0)>=0?"text-up":"text-down"}>{(p.pnl||0)>=0?"+":"−"}{dollar(Math.abs(p.pnl||0))}</strong></div><span className="closed-tag"><Check size={14}/> CLOSED</span></div>)}</div>}</div><div className="portfolio-fineprint"><CircleHelp size={16}/> Indicative P&L excludes fees, slippage, and funding. Virtual funds only, no real orders. Browser storage only.</div></div>}
       </div>
     </main>
-    <div className="axiom-statusbar"><div><SolanaGlyph size={14}/> Solana <span className="axiom-divider"/> {marketType==="stocks"?"STONK STOCK TOKENS":"JUPITER TOKENS V2"} <span className="axiom-divider"/> {refreshed?"MARKETS LIVE":"MARKETS CONNECTING"}</div><div><span>Virtual balance <strong>{dollar(equity)}</strong></span><span>Open <strong>{open.length}</strong></span><span>Realized <strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></span></div></div>
+    <div className="axiom-statusbar"><div><SolanaGlyph size={14}/> Solana <span className="axiom-divider"/> {marketType==="stocks"?"STOCK TOKENS":"MEMECOIN MARKETS"} <span className="axiom-divider"/> {refreshed?"MARKETS LIVE":"MARKETS CONNECTING"}</div><div><span>Virtual balance <strong>{dollar(equity)}</strong></span><span>Open <strong>{open.length}</strong></span><span>Realized <strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></span></div></div>
     {toast&&<div className="toast" role="status"><Check size={17}/>{toast}<button aria-label="Dismiss notification" onClick={()=>setToast("")}><X size={14}/></button></div>}
   </div>;
 }

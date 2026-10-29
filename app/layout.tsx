@@ -1,12 +1,33 @@
 import type { Metadata } from "next";
 import "./globals.css";
+
 export const metadata: Metadata = {
- icons: {
-  icon: [{url:"/icon.svg",type:"image/svg+xml",sizes:"any"}],
-  shortcut: "/icon.svg",
- },
- title: "Gravity — Memecoins & Stock Tokens",
- description: "Discover Pump.fun memecoins and StonkFun-listed stock tokens with market data and virtual long/short positions. No real orders.",
- openGraph: {title:"Gravity — Memecoins & Stock Tokens",description:"Explore memecoins and tokenized stocks on Solana with live market data and long/short position tracking.",images:["/gravity-scenes.webp"]},
+  metadataBase: new URL("https://gravity-one-lime.vercel.app"),
+  applicationName: "Gravity",
+  title: {
+    default: "Gravity | Memecoins & Stock Tokens",
+    template: "%s | Gravity",
+  },
+  description: "Explore memecoins and tokenized stocks, view live charts, and follow long or short positions in one trading terminal. Virtual funds only. No real orders.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml", sizes: "any" }],
+    shortcut: "/icon.svg",
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Gravity",
+    title: "Gravity | Memecoins & Stock Tokens",
+    description: "Two markets. One trading terminal. Discover tokens, follow price movement, and track long or short positions.",
+    url: "/",
+    images: [{ url: "/gravity-cinematic-hero.webp", alt: "Gravity market trading platform" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gravity | Memecoins & Stock Tokens",
+    description: "Memecoins and stock tokens in one clean trading terminal. Real market data. Virtual funds only.",
+    images: ["/gravity-cinematic-hero.webp"],
+  },
 };
-export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){return <html lang="en"><body>{children}</body></html>}
+export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
+  return <html lang="en"><body>{children}</body></html>;
+}
