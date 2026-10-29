@@ -202,7 +202,7 @@
 .preview-avatar{height:36px;width:36px;flex:none;border:1px solid #394f64;background:#243241;border-radius:11px;display:grid;place-items:center;color:#95c9f8}
 .preview-avatar.muted{background:#1c232e;color:#98a7be}
 .preview-tag{margin-left:auto;border-radius:99px;color:#84bdf0;font-size:12px;font-weight:650;background:#202b37;padding:8px 10px}
-.preview-bars{margin-left:auto;display:flex;align-items:end;height:30px;gap:4px}
+.preview-bars{margin-left:auto;display:flex;align-items:flex-end;height:30px;gap:4px}
 .preview-bars i{width:7px;height:12px;background:#4d6d8c;border-radius:3px}.preview-bars i:nth-child(2){height:25px;background:#7dbbf1}.preview-bars i:nth-child(3){height:18px;background:#6491b8}
 .preview-direction{display:grid;grid-template-columns:1fr 1fr;background:#1c2229;padding:4px;border-radius:99px;gap:3px;min-height:43px}
 .preview-direction span{display:grid;place-items:center;font-size:14px;font-weight:700;color:#b9c3cd}.preview-direction .selected{color:#0c1620;background:#7dbbf1;border-radius:99px}
@@ -758,7 +758,7 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 .axiom-status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ax-green);box-shadow:0 0 12px #17cc98}
 .axiom-main{width:100%;max-width:none;min-height:calc(100dvh - 130px);padding:0 clamp(14px,4.8vw,100px) 46px}
 .axiom-workspace{max-width:1600px;margin:0 auto;min-width:0}
-.axiom-section-bar{height:68px;display:flex;justify-content:space-between;align-items:end;
+.axiom-section-bar{height:68px;display:flex;justify-content:space-between;align-items:flex-end;
  gap:20px;padding-bottom:15px}
 .axiom-section-tabs{display:flex;align-items:center;gap:24px}
 .axiom-section-tabs button{border:0;background:none;padding:0;font-size:16px;font-weight:750;

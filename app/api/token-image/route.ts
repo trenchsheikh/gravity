@@ -7,7 +7,7 @@ const MAX_BYTES = 1_500_000;
 const ALLOWED_HOSTS = [
   "axiomtrading-v2.axiom-cdn.io", "ipfs.io", "dweb.link",
   "imagedelivery.net", "images.pump.fun", "raw.githubusercontent.com",
-  "arweave.net", "assets.coingecko.com", "metadata.j7tracker.io"
+  "arweave.net", "assets.coingecko.com", "metadata.j7tracker.io", "xstocks-metadata.backed.fi"
 ];
 const ALLOWED_SUFFIXES = [
   ".quicknode-ipfs.com", ".jup.ag", ".axiom-cdn.io", ".cloudflare-ipfs.com",
