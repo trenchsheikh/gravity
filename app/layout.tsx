@@ -5,8 +5,8 @@ export const metadata: Metadata = {
   icon: [{url:"/icon.svg",type:"image/svg+xml",sizes:"any"}],
   shortcut: "/icon.svg",
  },
- title: "Gravity — Long or Short Memecoins",
- description: "Discover Pump.fun memecoins, explore live Solana token prices, and simulate long or short positions. Paper trading only. No deposits or real trades.",
- openGraph: {title:"Gravity — Long or Short Memecoins",description:"Discover fresh Pump.fun launches and paper-trade the upside or downside using real market data.",images:["/gravity-scenes.webp"]},
+ title: "Gravity — Memecoins & Stock Tokens",
+ description: "Discover Pump.fun memecoins and StonkFun-listed stock tokens with market data and virtual long/short positions. No real orders.",
+ openGraph: {title:"Gravity — Memecoins & Stock Tokens",description:"Explore memecoins and tokenized stocks on Solana with live market data and long/short position tracking.",images:["/gravity-scenes.webp"]},
 };
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){return <html lang="en"><body>{children}</body></html>}
