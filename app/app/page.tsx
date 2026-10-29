@@ -9,7 +9,6 @@ import { Activity, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUp
 import Brand from "@/components/Brand";
 import SolanaWalletButton from "@/components/SolanaWalletButton";
 import type { Market } from "@/lib/markets";
-import { closePosition, freeBalance, getPnl, getPositions, lockedMargin, newPosition, Position, realisedPnl, STARTING_BALANCE, storePositions } from "@/lib/paper";
 
 type Candle=OhlcvCandle;
 type ChartInterval="1m"|"5m"|"15m"|"1H"|"4H"|"1D";
@@ -67,7 +66,6 @@ function windowChange(m:Market,window:"5m"|"1h"|"6h"|"24h"){return window==="5m"
 function windowVolume(m:Market,window:"5m"|"1h"|"6h"|"24h"){return window==="5m"?m.volume5m:window==="1h"?m.volume1h:window==="6h"?m.volume6h:m.volume24h}
 
 export default function Terminal(){
-  const [view,setView]=useState<"markets"|"positions">("markets");
   const [tab,setTab]=useState<"new"|"trending">("trending");
   const [marketType,setMarketType]=useState<"memes"|"stocks">("memes");
   const [windowSize,setWindowSize]=useState<"5m"|"1h"|"6h"|"24h">("1h");
@@ -90,11 +88,7 @@ export default function Terminal(){
   const [refreshed,setRefreshed]=useState<number|null>(null);
   const [tick,setTick]=useState(0);
   const [side,setSide]=useState<"long"|"short">("long");
-  const [margin,setMargin]=useState("100");
-  const [lev,setLev]=useState(1);
-  const [tradeMode,setTradeMode]=useState<"paper"|"live">("paper");
   const [walletAddress,setWalletAddress]=useState<string|null>(null);
-  const [positions,setPositions]=useState<Position[]>([]);
   const [prices,setPrices]=useState<Record<string,number>>({});
   const [toast,setToast]=useState("");
   const [candles,setCandles]=useState<Candle[]>([]);
@@ -102,14 +96,11 @@ export default function Terminal(){
   const [chartInterval,setChartInterval]=useState<ChartInterval>("1m");
   const [candlesLoading,setCandlesLoading]=useState(false);
   const [chartMessage,setChartMessage]=useState("Historical market data isn't available for this token yet.");
-  const [processing,setProcessing]=useState(false);
-  const [mobileMenu,setMobileMenu]=useState(false);
-  const [mobileTrading,setMobileTrading]=useState(false);
   const [watchlist,setWatchlist]=useState<string[]>([]);
   const [watchOnly,setWatchOnly]=useState(false);
-  const [detailTab,setDetailTab]=useState<"overview"|"positions"|"info">("overview");
+  const [detailTab,setDetailTab]=useState<"overview"|"info">("overview");
 
-  useEffect(()=>{setPositions(getPositions());try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}
+  useEffect(()=>{try{const v=JSON.parse(localStorage.getItem("gravity.watchlist.v1")||"[]");if(Array.isArray(v))setWatchlist(v.filter(x=>typeof x==="string"));}catch{}
     try{const tokens=JSON.parse(localStorage.getItem("gravity.token.catalog.v1")||"[]");if(Array.isArray(tokens))setCatalog(tokens.filter((m:Market)=>m&&typeof m.mint==="string").slice(0,280));}catch{}
   },[]);
 
@@ -162,8 +153,8 @@ export default function Terminal(){
       setPrices(old=>({...old,...Object.fromEntries(list.filter(m=>m.priceUsd!=null&&m.priceUsd>0).map(m=>[m.mint,m.priceUsd!]))}));
     } catch(e){if(current()){const msg=e instanceof Error?e.message:"Could not load markets";setError(msg);setCacheNotice(msg)}}finally{if(current()){setLoading(false);setFetching(false)}}
   },[tab,query,windowSize,marketType,activeFeedKey]);
-  useEffect(()=>{if(!pageVisible||view!=="markets"||tradeOpen||watchOnly)return;const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query.trim()?350:0);return()=>{clearTimeout(timeout);c.abort();requestSerial.current++}},[fetchMarkets,tick,pageVisible,view,tradeOpen,watchOnly]);
-  useEffect(()=>{if(!pageVisible||view!=="markets"||tradeOpen||watchOnly)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible,view,tradeOpen,watchOnly]);
+  useEffect(()=>{if(!pageVisible||tradeOpen||watchOnly)return;const c=new AbortController();const timeout=setTimeout(()=>fetchMarkets(c.signal),query.trim()?350:0);return()=>{clearTimeout(timeout);c.abort();requestSerial.current++}},[fetchMarkets,tick,pageVisible,tradeOpen,watchOnly]);
+  useEffect(()=>{if(!pageVisible||tradeOpen||watchOnly)return;const timer=setInterval(()=>setTick(x=>x+1),15000);return()=>clearInterval(timer)},[pageVisible,tradeOpen,watchOnly]);
   useEffect(()=>{if(pageVisible)setTick(x=>x+1)},[pageVisible]);
   useEffect(()=>{
     if(!tradeOpen||!selected?.mint||!pageVisible)return;
@@ -214,17 +205,6 @@ export default function Terminal(){
     return()=>{active=false;controller?.abort();clearInterval(timer)};
   },[tradeOpen,selected?.mint,chartInterval,pageVisible]);
   useEffect(()=>{
-    const mints=[...new Set(positions.filter(p=>!p.closedAt).map(p=>p.mint))].slice(0,10);
-    if(!mints.length||!pageVisible)return;
-    let cancelled=false;
-    const refresh=async()=>{
-      const found=await Promise.all(mints.map(async mint=>{try{const r=await fetch(`/api/markets?q=${mint}`,{cache:"no-store"});if(!r.ok)return null;const d=await r.json();const m=d.markets?.find((m:Market)=>m.mint===mint&&m.priceUsd!=null&&m.priceUsd>0);return m?[mint,m.priceUsd] as const:null}catch{return null}}));
-      if(!cancelled)setPrices(prev=>({...prev,...Object.fromEntries(found.filter(Boolean) as (readonly [string,number])[])}));
-    };
-    void refresh();const timer=setInterval(refresh,15000);return()=>{cancelled=true;clearInterval(timer)};
-  },[positions,pageVisible]);
-
-  useEffect(()=>{
     if(!tradeOpen||!selected?.mint||!pageVisible)return;
     const mint=selected.mint;let closed=false;
     const refresh=async()=>{
@@ -251,7 +231,7 @@ export default function Terminal(){
     return [...list].sort((a,b)=>(sortValue(b)??Number.NEGATIVE_INFINITY)-(sortValue(a)??Number.NEGATIVE_INFINITY));
   },[markets,catalog,watchOnly,watchlist,tab,marketType,query,sortBy,windowSize,resultsReady]);
   const selectMarket=(next:"memes"|"stocks")=>{
-    if(view==="markets"&&!tradeOpen&&!watchOnly&&marketType===next&&!query.trim())return;
+    if(!tradeOpen&&!watchOnly&&marketType===next&&!query.trim())return;
     requestSerial.current++;
     const key=next+":"+tab+":"+windowSize;
     let cached:null|{markets:Market[];time:number}=null;
@@ -260,23 +240,19 @@ export default function Terminal(){
       const item=cache[key];
       if(item&&Array.isArray(item.markets)&&Date.now()-item.time<6*3600000)cached=item;
     }catch{}
-    setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);setFetching(false);
+    setMarketType(next);setWatchOnly(false);setTradeOpen(false);setFetching(false);
     setQuery("");setMarkets(cached?.markets||[]);setShownFeedKey(cached?next+":"+tab+":"+windowSize+":":"");setLoading(!cached);
     setError("");setCacheNotice("");
     setRefreshed(cached?.time||null);setCacheTime(cached?.time||null);
   };
   const showWatchlist=()=>{
     requestSerial.current++;
-    setView("markets");setTradeOpen(false);setWatchOnly(true);
+    setTradeOpen(false);setWatchOnly(true);
     setQuery("");setError("");setFetching(false);
-  };
-  const showPortfolio=()=>{
-    requestSerial.current++;
-    setTradeOpen(false);setView("positions");setFetching(false);
   };
   const searchMarkets=(value:string)=>{
     requestSerial.current++;
-    setQuery(value);setView("markets");setTradeOpen(false);
+    setQuery(value);setTradeOpen(false);
     setWatchOnly(false);setError("");setFetching(false);
   };
   const openTrade=(m:Market)=>{
@@ -284,37 +260,24 @@ export default function Terminal(){
     const list=document.querySelector(".axiom-list-scroll");
     listScroll.current={top:window.scrollY,left:list?.scrollLeft||0,listTop:list?.scrollTop||0};
     setSelected(m);setDetailTab("overview");setSelectedLastUpdated(null);
-    setTradeOpen(true);setMobileTrading(true);setFetching(false);
+    setTradeOpen(true);setFetching(false);
     window.scrollTo({top:0,behavior:"instant"});
   };
   const hideTrade=()=>{
-    setTradeOpen(false);setMobileTrading(false);
+    setTradeOpen(false);
     requestAnimationFrame(()=>{
       const list=document.querySelector(".axiom-list-scroll");
       if(list){list.scrollLeft=listScroll.current.left;list.scrollTop=listScroll.current.listTop;}
       window.scrollTo({top:listScroll.current.top,behavior:"instant"});
     });
   };
-  const open=positions.filter(p=>!p.closedAt);
-  const closed=positions.filter(p=>!!p.closedAt);
-  const realised=realisedPnl(positions);
-  const equity=STARTING_BALANCE+realised+open.reduce((s,p)=>s+(prices[p.mint]?Math.max(-p.margin,getPnl(p,prices[p.mint])):0),0);
   const currentPrice=selected?(prices[selected.mint]??selected.priceUsd):null;
-  const quoteFresh=!!selectedLastUpdated&&Date.now()-selectedLastUpdated<30000;
-  const canOpen=tradeMode==="paper"&&quoteFresh&&!!currentPrice&&currentPrice>0&&Number(margin)>=5&&Number(margin)<=1000&&Number(margin)<=freeBalance(positions);
-  const chooseTradeMode=(mode:"paper"|"live")=>{
-    if(mode===tradeMode)return;
-    setTradeMode(mode);
-    if(mode==="live"&&detailTab==="positions")setDetailTab("overview");
-  };
   const showWalletMenu=()=>window.dispatchEvent(new Event("gravity:open-wallet"));
-  function toggleWatch(mint:string){const next=watchlist.includes(mint)?watchlist.filter(x=>x!==mint):[...watchlist,mint];setWatchlist(next);localStorage.setItem("gravity.watchlist.v1",JSON.stringify(next))}
-  function openPaper(){if(tradeMode!=="paper"){setToast("Live trading is not available.");return}if(!selected||!canOpen){setToast("A fresh market price is required before opening a position.");return}setProcessing(true);try{
-    const position=newPosition({...selected,priceUsd:currentPrice},side,Number(margin),lev,positions);
-    const next=[position,...positions];setPositions(next);storePositions(next);setToast(`${side.toUpperCase()} position opened on ${selected.symbol} with virtual funds.`);
-  }catch(e){setToast((e as Error).message)}finally{setProcessing(false)}}
-  function closePaper(p:Position){const mark=prices[p.mint];if(!mark){setToast("Current market price unavailable. Cannot close yet.");return}try{const next=positions.map(x=>x.id===p.id?closePosition(x,mark):x);setPositions(next);storePositions(next);setToast(`Position on ${p.symbol} closed.`)}catch(e){setToast((e as Error).message)}}
-  const selectedActive=selected && open.filter(p=>p.mint===selected.mint).length;
+  function toggleWatch(mint:string){
+    const next=watchlist.includes(mint)?watchlist.filter(x=>x!==mint):[...watchlist,mint];
+    setWatchlist(next);
+    localStorage.setItem("gravity.watchlist.v1",JSON.stringify(next));
+  }
   const currentChartKey=selected?selected.mint+":"+chartInterval:"";
   const activeCandles=chartKey===currentChartKey?candles:(candleCache.get(currentChartKey)?.candles||[]);
   const activeChartLoading=candlesLoading||(chartKey!==currentChartKey&&!activeCandles.length);
@@ -323,27 +286,26 @@ export default function Terminal(){
       <div className="axiom-header-left">
         <Brand small/>
         <nav className="axiom-primary-nav" aria-label="App navigation">
- <button className={view==="markets"&&marketType==="memes"&&!watchOnly?"active":""} onClick={()=>selectMarket("memes")}>Memecoins</button>
- <button className={view==="markets"&&marketType==="stocks"&&!watchOnly?"active":""} onClick={()=>selectMarket("stocks")}>Stock tokens </button>
- <button className={view==="markets"&&watchOnly?"active":""} onClick={showWatchlist}>Watchlist</button>
- <button className={view==="positions"?"active":""} onClick={showPortfolio}>Portfolio <span className="axiom-nav-count">{open.length}</span></button>
+ <button className={marketType==="memes"&&!watchOnly?"active":""} onClick={()=>selectMarket("memes")}>Memecoins</button>
+ <button className={marketType==="stocks"&&!watchOnly?"active":""} onClick={()=>selectMarket("stocks")}>Stock tokens </button>
+ <button className={watchOnly?"active":""} onClick={showWatchlist}>Watchlist</button>
  </nav>
       </div>
       <div className="axiom-header-right">
         <div className="axiom-search"><Search size={16}/><input value={query} onChange={e=>searchMarkets(e.target.value)} aria-label="Search token or contract address" placeholder="Search by token or CA"/>{query?<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={14}/></button>:<kbd>/</kbd>}</div>
         <div className="axiom-network"><SolanaGlyph size={18}/> <span>SOL</span><ChevronDown size={12}/></div>
-        {!(tradeOpen&&tradeMode==="live")&&<div className="axiom-balance"><Wallet size={15}/><span>{dollar(freeBalance(positions))}</span><small>VIRTUAL</small></div>}
+        }
         <Link href="/docs" className="axiom-docs-link" aria-label="Gravity documentation"><BookOpen size={16}/><span>Docs</span></Link>
         <SolanaWalletButton onAddressChange={setWalletAddress}/>
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
       </div>
     </header>
-    <div className="axiom-utility"><div><ShieldCheck size={14}/> {tradeOpen&&tradeMode==="live"?"LIVE MODE · ORDERS NOT ENABLED":"VIRTUAL FUNDS ONLY · NO REAL ORDERS"} <span>·</span> Market data</div><div><span className="axiom-status-dot"/>{cacheNotice?"Using cached data":refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"N/A"}</div></div>
+    <div className="axiom-utility"><div><ShieldCheck size={14}/> LIVE MARKET DATA · EXECUTION UNAVAILABLE <span>·</span> Market data</div><div><span className="axiom-status-dot"/>{cacheNotice?"Using cached data":refreshed?"Feed active":"Connecting"} <span>·</span> {refreshed?new Date(refreshed).toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}):"N/A"}</div></div>
     <main className="axiom-main">
       <div className="axiom-workspace">
         <div className="axiom-mobile-search"><Search size={16}/><input value={query} onChange={e=>searchMarkets(e.target.value)} placeholder="Search token or contract address"/></div>
 
-        {view==="markets"?<><div className="gravity-screener gravity-section-enter" style={{display:tradeOpen?"none":undefined}}>
+        <div className="gravity-screener gravity-section-enter" style={{display:tradeOpen?"none":undefined}}>
           <div className="axiom-section-bar">
             <div className="axiom-section-tabs">
  <button className={!watchOnly&&tab==="trending"?"current":""} onClick={()=>{setTab("trending");setWatchOnly(false)}}>{marketType==="stocks"?"Top stocks":"Top"}</button>
@@ -427,7 +389,7 @@ export default function Terminal(){
         </div>
         <div className="gravity-compact-tabs" role="tablist" aria-label="Token information">
           <button role="tab" aria-selected={detailTab==="overview"} className={detailTab==="overview"?"active":""} onClick={()=>setDetailTab("overview")}>Overview</button>
-          {tradeMode==="paper"&&<button role="tab" aria-selected={detailTab==="positions"} className={detailTab==="positions"?"active":""} onClick={()=>setDetailTab("positions")}>My positions <span>{open.filter(p=>p.mint===selected.mint).length}</span></button>}
+
           <button role="tab" aria-selected={detailTab==="info"} className={detailTab==="info"?"active":""} onClick={()=>setDetailTab("info")}>Token details</button>
         </div>
         <div className="gravity-compact-tabbody">
@@ -435,9 +397,7 @@ export default function Terminal(){
             <span className="gravity-compact-subtitle">Price change</span>
             {(["5m","1h","6h","24h"] as const).map(w=><div key={w}><span>{w}</span><strong className={(windowChange(selected,w)??0)>=0?"text-up":"text-down"}>{change(windowChange(selected,w))}</strong></div>)}
             <span className="gravity-compact-score">Organic score <strong>{selected.organicScore==null?"N/A":selected.organicScore.toFixed(0)+"/100"}</strong></span>
-          </div>:detailTab==="positions"?<div className="gravity-compact-positions">
-            {open.filter(p=>p.mint===selected.mint).length===0?<span>No open positions for this token.</span>:open.filter(p=>p.mint===selected.mint).map(p=><div className="gravity-compact-position" key={p.id}><strong className={p.side==="long"?"text-up":"text-down"}>{p.side.toUpperCase()} {p.leverage}×</strong><span>{dollar(p.margin)} margin</span><strong className={currentPrice&&getPnl(p,currentPrice)>=0?"text-up":"text-down"}>{currentPrice?(getPnl(p,currentPrice)>=0?"+":"−")+dollar(Math.abs(Math.max(-p.margin,getPnl(p,currentPrice)))):"N/A"}</strong><button disabled={!quoteFresh} onClick={()=>closePaper(p)}>Close</button></div>)}
-          </div>:<div className="gravity-compact-info">
+          </div>:          </div>:<div className="gravity-compact-info">
             <div><span>Contract</span><button onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}>{selected.mint.slice(0,10)}…{selected.mint.slice(-7)} <CopyIcon/></button></div>
             <div><span>Network</span><strong><SolanaGlyph size={14}/> Solana</strong></div>
             <div><span>Verification</span><strong>{selected.isVerified?"Verified":"Unverified"}</strong></div>
