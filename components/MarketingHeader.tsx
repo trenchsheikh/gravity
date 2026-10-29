@@ -17,6 +17,6 @@ export default function MarketingHeader(){
   <nav aria-label="Primary navigation">
    <a href="#product">The platform</a><a href="#how">How it works</a><a href="#about">About Gravity</a>
   </nav>
-  <div className="gravity-header-actions"><XSocialLink placement="header"/><Link href="/app" className="pill pill-nav">Launch app</Link></div>
+  <div className="gravity-header-actions"><Link href="/docs" className="gravity-header-docs">Docs</Link><XSocialLink placement="header"/><Link href="/app" className="pill pill-nav">Launch app</Link></div>
  </header>;
 }

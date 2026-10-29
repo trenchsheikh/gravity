@@ -5,7 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import type {OhlcvCandle} from "@/components/MarketCandlestickChart";
 const MarketCandlestickChart=dynamic(()=>import("@/components/MarketCandlestickChart"),{ssr:false});
-import { Activity, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Clock3, Compass, ExternalLink, LoaderCircle, Menu, RefreshCw, Search, ShieldCheck, Star, TrendingDown, TrendingUp, Wallet, X } from "lucide-react";
+import { Activity, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Clock3, Compass, ExternalLink, LoaderCircle, Menu, RefreshCw, Search, ShieldCheck, Star, TrendingDown, TrendingUp, Wallet, X, BookOpen } from "lucide-react";
 import Brand from "@/components/Brand";
 import SolanaWalletButton from "@/components/SolanaWalletButton";
 import type { Market } from "@/lib/markets";
@@ -325,6 +325,7 @@ export default function Terminal(){
         <div className="axiom-search"><Search size={16}/><input value={query} onChange={e=>searchMarkets(e.target.value)} aria-label="Search token or contract address" placeholder="Search by token or CA"/>{query?<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={14}/></button>:<kbd>/</kbd>}</div>
         <div className="axiom-network"><SolanaGlyph size={18}/> <span>SOL</span><ChevronDown size={12}/></div>
         <div className="axiom-balance"><Wallet size={15}/><span>{dollar(freeBalance(positions))}</span><small>VIRTUAL</small></div>
+        <Link href="/docs" className="axiom-docs-link" aria-label="Gravity documentation"><BookOpen size={16}/><span>Docs</span></Link>
         <SolanaWalletButton/>
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
       </div>

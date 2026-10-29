@@ -1715,3 +1715,34 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 @media(prefers-reduced-motion:reduce){
  .gravity-landing .gravity-x-social{transition:none}
 }
+
+
+/* Documentation entry points across the website and terminal. */
+.gravity-landing .gravity-header-docs{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:41px;padding:0 12px;white-space:nowrap;
+  color:#b8d6f5;font:680 13px Manrope,Arial,sans-serif;
+  text-decoration:none;border-radius:9px;
+  transition:color .15s ease,background .15s ease
+}
+.gravity-landing .gravity-header-docs:hover{background:#24406377;color:#fff}
+.gravity-landing .gravity-footer-docs{
+  color:#a7c4e4;text-decoration:none;font:650 12px Manrope,Arial,sans-serif
+}
+.gravity-landing .gravity-footer-docs:hover{color:#fff}
+.axiom-terminal .axiom-docs-link{
+  height:34px;padding:0 11px;display:inline-flex;align-items:center;gap:7px;flex:none;
+  border:1px solid #304b6d;color:#b3cbed;border-radius:999px;
+  font-size:11px;font-weight:700;text-decoration:none;background:rgba(18,42,70,.44)
+}
+.axiom-terminal .axiom-docs-link:hover{border-color:#6aa8e5;color:#fff;background:#1a3654}
+@media(max-width:860px){
+ .axiom-terminal .axiom-docs-link{width:31px;padding:0;justify-content:center;height:32px}
+ .axiom-terminal .axiom-docs-link span{display:none}
+}
+@media(max-width:590px){
+ .gravity-landing .gravity-header-docs{font-size:12px;padding:0 7px;height:36px}
+}
+@media(max-width:380px){
+ .gravity-landing .gravity-header-actions .gravity-x-social-header{display:none}
+}
