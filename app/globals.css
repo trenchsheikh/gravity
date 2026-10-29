@@ -1746,3 +1746,34 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 @media(max-width:380px){
  .gravity-landing .gravity-header-actions .gravity-x-social-header{display:none}
 }
+
+
+/* Keep the three primary links centered across the full header, not between logo and CTA. */
+@media(min-width:761px){
+  .gravity-landing>.marketing-nav.gravity-glass-header{isolation:isolate}
+  .gravity-landing>.marketing-nav.gravity-glass-header>nav{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    margin:0;
+    justify-content:center;
+    white-space:nowrap;
+  }
+  .gravity-landing>.marketing-nav.gravity-glass-header>.brand,
+  .gravity-landing>.marketing-nav.gravity-glass-header>.gravity-header-actions{
+    position:relative;z-index:1;
+  }
+}
+@media(min-width:761px) and (max-width:1230px){
+  .gravity-landing>.marketing-nav.gravity-glass-header>nav{gap:20px;font-size:12px}
+  .gravity-landing>.marketing-nav.gravity-glass-header .gravity-x-social-header{
+    width:39px;padding:0;
+  }
+  .gravity-landing>.marketing-nav.gravity-glass-header .gravity-x-social-header span{display:none}
+  .gravity-landing>.marketing-nav.gravity-glass-header .gravity-header-actions{gap:6px}
+  .gravity-landing>.marketing-nav.gravity-glass-header .pill-nav{padding-inline:17px}
+}
+@media(min-width:761px) and (max-width:940px){
+  .gravity-landing>.marketing-nav.gravity-glass-header>nav{display:none}
+}
