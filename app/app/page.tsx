@@ -115,17 +115,20 @@ export default function Terminal(){
     document.addEventListener("visibilitychange",onVisibility);
     return()=>document.removeEventListener("visibilitychange",onVisibility);
   },[]);
+  const activeFeedKey=marketType+":"+tab+":"+windowSize+":"+query.trim().toLowerCase();
   useEffect(()=>{
-    if(query.trim())return;
+    let saved:null|{markets:Market[];time:number}=null;
     try{
-      const all=JSON.parse(localStorage.getItem("gravity.market.cache.v2")||"{}");
-      const item=all[marketType+":"+tab+":"+windowSize];
-      if(item&&Array.isArray(item.markets)&&Number.isFinite(item.time)&&Date.now()-item.time<6*3600000){
-        setMarkets(item.markets.slice(0,120));setCacheTime(item.time);setLoading(false);
-        setCacheNotice("Showing cached markets. Refreshing now.");
-      }
+      const cache=JSON.parse(localStorage.getItem("gravity.market.cache.v2")||"{}");
+      const item=cache[marketType+":"+tab+":"+windowSize];
+      if(!query.trim()&&item&&Array.isArray(item.markets)&&Date.now()-item.time<6*3600000)saved=item;
     }catch{}
-  },[tab,windowSize,query,marketType]);
+    setMarkets(saved?.markets||[]);
+    setShownFeedKey(saved?activeFeedKey:"");
+    setCacheTime(saved?.time||null);
+    setCacheNotice(saved?"Updating saved markets":"");
+    setLoading(!saved);setError("");
+  },[activeFeedKey,marketType,tab,windowSize,query]);
   useEffect(()=>{if(!toast)return;const id=setTimeout(()=>setToast(""),4500);return()=>clearTimeout(id)},[toast]);
   const fetchMarkets=useCallback(async(signal?:AbortSignal)=>{
     setError("");
