@@ -1478,3 +1478,27 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 .axiom-terminal .axiom-primary-nav button{letter-spacing:-.015em}
 .axiom-terminal .axiom-primary-nav button:focus-visible{outline-offset:-3px}
 @media(max-width:620px){.axiom-terminal .axiom-primary-nav{scrollbar-width:none;overscroll-behavior-x:contain}.axiom-terminal .axiom-primary-nav button{flex:none}}
+
+
+/* Stable, low-latency app navigation */
+@keyframes gravity-section-enter{
+  from{opacity:.72;transform:translateY(4px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.axiom-terminal .gravity-section-enter{animation:gravity-section-enter .16s ease-out both}
+.axiom-terminal .axiom-primary-nav button,
+.axiom-terminal .axiom-section-tabs button,
+.axiom-terminal .gravity-compact-tabs button{
+  transition:color .14s ease,background-color .14s ease,border-color .14s ease
+}
+.axiom-terminal .axiom-row{transition:background-color .12s ease}
+.axiom-terminal .axiom-list-container{min-height:170px}
+.axiom-terminal .axiom-refresh:disabled{opacity:.56;cursor:wait}
+.axiom-terminal .axiom-list-body[aria-busy="true"]{contain:layout style}
+@media(prefers-reduced-motion:reduce){
+  .axiom-terminal .gravity-section-enter{animation:none}
+  .axiom-terminal .axiom-primary-nav button,
+  .axiom-terminal .axiom-section-tabs button,
+  .axiom-terminal .gravity-compact-tabs button,
+  .axiom-terminal .axiom-row{transition:none}
+}
