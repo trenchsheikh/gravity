@@ -7,6 +7,7 @@ import type {OhlcvCandle} from "@/components/MarketCandlestickChart";
 const MarketCandlestickChart=dynamic(()=>import("@/components/MarketCandlestickChart"),{ssr:false});
 import { Activity, ArrowDownLeft, ArrowDownRight, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, CircleHelp, Clock3, Compass, ExternalLink, LoaderCircle, Menu, RefreshCw, Search, ShieldCheck, Star, TrendingDown, TrendingUp, Wallet, X } from "lucide-react";
 import Brand from "@/components/Brand";
+import SolanaWalletButton from "@/components/SolanaWalletButton";
 import type { Market } from "@/lib/markets";
 import { closePosition, freeBalance, getPnl, getPositions, lockedMargin, newPosition, Position, realisedPnl, STARTING_BALANCE, storePositions } from "@/lib/paper";
 
@@ -324,6 +325,7 @@ export default function Terminal(){
         <div className="axiom-search"><Search size={16}/><input value={query} onChange={e=>searchMarkets(e.target.value)} aria-label="Search token or contract address" placeholder="Search by token or CA"/>{query?<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={14}/></button>:<kbd>/</kbd>}</div>
         <div className="axiom-network"><SolanaGlyph size={18}/> <span>SOL</span><ChevronDown size={12}/></div>
         <div className="axiom-balance"><Wallet size={15}/><span>{dollar(freeBalance(positions))}</span><small>VIRTUAL</small></div>
+        <SolanaWalletButton/>
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
       </div>
     </header>
@@ -437,7 +439,7 @@ export default function Terminal(){
       <aside className="gravity-detail-sidebar">
         <div className="gravity-sidebar-token"><TokenIcon market={selected} size={30}/><div><strong>{selected.symbol} / USDC</strong><span>Virtual funds · No live orders</span></div></div>
         <div className="order-panel"><div className="order-title"><strong>Position</strong><span>VIRTUAL</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Collateral</span><span>Available {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open ${side}`:"Live price / collateral required"}</button></div>
-        <p className="gravity-compact-risk">Virtual funds only; no real orders or liquidations. Stock tokens are not direct shares.</p>
+        
       </aside>
     </div>
   </section>}
