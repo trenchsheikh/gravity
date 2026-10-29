@@ -27,19 +27,19 @@ function PremiumToken({variant,id,size=44}:{variant:MedallionStyle;id:string;siz
     <stop stopColor="#e0f7ff"/><stop offset=".55" stopColor={accent}/><stop offset="1" stopColor="#3c74b2"/>
    </linearGradient>
   </defs>
-  <circle cx="44" cy="44" r="41" fill="url(#"+id+"-rim)" stroke="#8cb9e4" strokeOpacity=".42" strokeWidth=".6"/>
+  <circle cx="44" cy="44" r="41" fill={`url(#${id}-rim)`} stroke="#8cb9e4" strokeOpacity=".42" strokeWidth=".6"/>
   <circle cx="44" cy="44" r="36.6" fill="#07111f" stroke="#010a19" strokeWidth="1.2"/>
-  <circle cx="44" cy="44" r="34.1" fill="url(#"+id+"-face)" stroke="url(#"+id+"-shine)" strokeWidth="1.2"/>
+  <circle cx="44" cy="44" r="34.1" fill={`url(#${id}-face)`} stroke={`url(#${id}-shine)`} strokeWidth="1.2"/>
   <path d="M20 26A31 31 0 0 1 63 21" stroke="#e0f4ff" strokeOpacity=".49" strokeWidth="1.4" strokeLinecap="round"/>
   <path d="M64 66A31 31 0 0 1 25 68" stroke="#81befb" strokeOpacity=".36" strokeWidth="1.4" strokeLinecap="round"/>
   <circle cx="44" cy="44" r="26" stroke={stroke} strokeOpacity=".22" strokeWidth=".8" strokeDasharray="2 4"/>
   {isStock?
-   <g stroke="url(#"+id+"-shine)" strokeWidth="3.3" strokeLinecap="round" strokeLinejoin="round">
+   <g stroke={`url(#${id}-shine)`} strokeWidth="3.3" strokeLinecap="round" strokeLinejoin="round">
     <path d="M27 57V51M39 57V43M51 57V36M63 57V27"/>
     <path d="M26 39L39 33L49 39L63 25"/>
     <path d="M55 25H63V33"/>
    </g>:
-   <g stroke="url(#"+id+"-shine)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+   <g stroke={`url(#${id}-shine)`} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <path d="M44 22L49 35L62 40L49 45L44 59L39 45L26 40L39 35L44 22Z"/>
     <path d="M60 54L63 60L69 63L63 66L60 72L57 66L51 63L57 60Z" strokeWidth="1.8"/>
    </g>}
