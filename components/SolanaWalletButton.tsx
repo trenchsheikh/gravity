@@ -24,7 +24,7 @@ function WalletGlyph({wallet}:{wallet:StandardWallet}){
   </span>;
 }
 
-export default function SolanaWalletButton(){
+export default function SolanaWalletButton({onAddressChange}:{onAddressChange?:(address:string|null)=>void}){
   const [wallets,setWallets]=useState<StandardWallet[]>([]);
   const [selected,setSelected]=useState<StandardWallet|null>(null);
   const [address,setAddress]=useState<string|null>(null);
@@ -34,6 +34,12 @@ export default function SolanaWalletButton(){
   const [copied,setCopied]=useState(false);
   const root=useRef<HTMLDivElement|null>(null);
   const busyRef=useRef(false);
+  useEffect(()=>{onAddressChange?.(address)},[address,onAddressChange]);
+  useEffect(()=>{
+    const handle=()=>{setOpen(true);setError("")};
+    window.addEventListener("gravity:open-wallet",handle);
+    return()=>window.removeEventListener("gravity:open-wallet",handle);
+  },[]);
 
   useEffect(()=>{
     const registry=getWallets();

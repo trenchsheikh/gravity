@@ -1777,3 +1777,53 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
 @media(min-width:761px) and (max-width:940px){
   .gravity-landing>.marketing-nav.gravity-glass-header>nav{display:none}
 }
+
+
+/* Distinct Paper and Live experiences on token details. Live is view-only until execution exists. */
+.axiom-terminal .gravity-compact-market .gravity-trade-mode{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;
+  background:#0b1524;border:1px solid #2a4466;border-radius:10px;padding:4px;
+  margin:0 0 13px
+}
+.axiom-terminal .gravity-trade-mode button{
+  display:flex;align-items:center;justify-content:center;height:36px;
+  background:transparent;color:#849dbb;font-size:12px;font-weight:770;
+  border:1px solid transparent;border-radius:7px;cursor:pointer;
+  transition:background-color .15s,color .15s,border-color .15s
+}
+.axiom-terminal .gravity-trade-mode button:hover{color:#e8f5ff}
+.axiom-terminal .gravity-trade-mode button.active.paper{
+  background:#203e61;color:#c8e6ff;border-color:#4677a5;
+  box-shadow:0 2px 9px #01071258
+}
+.axiom-terminal .gravity-trade-mode button.active.live{
+  background:#153b38;color:#8bf1d2;border-color:#246a5e;
+  box-shadow:0 2px 9px #01071258
+}
+.axiom-terminal .gravity-live-ticket{display:flex!important;flex-direction:column;gap:0}
+.axiom-terminal .gravity-live-ticket .order-title>span{
+  background:#192a36;color:#8dbfb8;font-size:10px
+}
+.axiom-terminal .gravity-live-wallet{
+  display:flex;flex-direction:column;gap:9px;padding:15px 14px;margin:1px 0 18px;
+  border-radius:10px;border:1px solid #284b65;background:linear-gradient(135deg,#14253b,#0d1b2b)
+}
+.axiom-terminal .gravity-live-wallet-label{display:flex;align-items:center;gap:8px;color:#9abadd;font-size:11px;font-weight:750}
+.axiom-terminal .gravity-live-wallet>strong{font-size:15px;color:#e8f5ff;font-weight:750;font-variant-numeric:tabular-nums}
+.axiom-terminal .gravity-live-wallet-detail{font-size:11px;line-height:1.55;color:#8da9c5}
+.axiom-terminal .gravity-live-ticket .direction-switch{margin-bottom:16px}
+.axiom-terminal .gravity-live-summary{margin-top:4px}
+.axiom-terminal .gravity-live-unavailable{color:#c1a18c!important}
+.axiom-terminal .gravity-live-connect{
+  margin-top:17px;width:100%;height:42px;display:flex;align-items:center;justify-content:center;
+  gap:9px;border-radius:8px;border:1px solid #659ce0;background:#213f65;
+  color:#dbecff;font-family:inherit;font-size:12px;font-weight:760;cursor:pointer
+}
+.axiom-terminal .gravity-live-connect:hover{background:#2d507a;border-color:#94c5ff}
+.axiom-terminal .gravity-detail-sidebar .gravity-live-submit,
+.axiom-terminal .gravity-detail-sidebar .gravity-live-submit:disabled{
+  background:#213149!important;border:1px solid #344a65!important;color:#8ca4c1!important;
+  opacity:1;cursor:not-allowed
+}
+.axiom-terminal .gravity-live-disclosure{margin:14px 0 6px;font-size:11px;line-height:1.65;color:#92aac9}
+@media(prefers-reduced-motion:reduce){.axiom-terminal .gravity-trade-mode button{transition:none}}

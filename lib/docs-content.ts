@@ -319,7 +319,7 @@ export const docs:DocArticle[]=[
         "id": "positions-explained",
         "title": "How a virtual position works",
         "body": [
-          "Gravity uses real price updates to mark virtual long or short positions. Long exposure increases in value when the reference token price rises; short exposure increases in value when it falls.",
+          "Gravity uses real price updates to mark virtual long or short positions. Select Paper in the token ticket to use the $10,000 virtual account. Select Live to view a separate wallet-connected interface; live order execution is not enabled. Long exposure increases in value when the reference token price rises; short exposure increases in value when it falls.",
           "Opening a position changes your locally recorded virtual balance and open-position list. It does not submit a transaction to Solana or another trading venue."
         ]
       },
@@ -616,7 +616,7 @@ export const docs:DocArticle[]=[
         "id": "available-now",
         "title": "Available in Gravity today",
         "body": [
-          "The current website and terminal include memecoin discovery, stock token discovery, token search and sorting, market charts, wallet connection, watchlists, virtual long/short positions, local portfolio tracking and trade history."
+          "The current website and terminal include memecoin discovery, stock token discovery, token search and sorting, market charts, wallet connection, watchlists, virtual long/short positions, local portfolio tracking and trade history. The token page now has a Paper / Live selector. Paper operates entirely with virtual funds; Live presents a wallet-connected view but does not execute orders."
         ],
         "bullets": [
           "Solana-only compatible wallet connection.",
