@@ -294,7 +294,6 @@ export default function Terminal(){
       <div className="axiom-header-right">
         <div className="axiom-search"><Search size={16}/><input value={query} onChange={e=>searchMarkets(e.target.value)} aria-label="Search token or contract address" placeholder="Search by token or CA"/>{query?<button aria-label="Clear search" onClick={()=>setQuery("")}><X size={14}/></button>:<kbd>/</kbd>}</div>
         <div className="axiom-network"><SolanaGlyph size={18}/> <span>SOL</span><ChevronDown size={12}/></div>
-        }
         <Link href="/docs" className="axiom-docs-link" aria-label="Gravity documentation"><BookOpen size={16}/><span>Docs</span></Link>
         <SolanaWalletButton onAddressChange={setWalletAddress}/>
         <Link className="axiom-home" href="/" aria-label="Back to Gravity homepage"><ArrowUpRight size={18}/></Link>
@@ -397,7 +396,7 @@ export default function Terminal(){
             <span className="gravity-compact-subtitle">Price change</span>
             {(["5m","1h","6h","24h"] as const).map(w=><div key={w}><span>{w}</span><strong className={(windowChange(selected,w)??0)>=0?"text-up":"text-down"}>{change(windowChange(selected,w))}</strong></div>)}
             <span className="gravity-compact-score">Organic score <strong>{selected.organicScore==null?"N/A":selected.organicScore.toFixed(0)+"/100"}</strong></span>
-          </div>:          </div>:<div className="gravity-compact-info">
+          </div>:<div className="gravity-compact-info">
             <div><span>Contract</span><button onClick={()=>navigator.clipboard.writeText(selected.mint).then(()=>setToast("Contract copied"))}>{selected.mint.slice(0,10)}…{selected.mint.slice(-7)} <CopyIcon/></button></div>
             <div><span>Network</span><strong><SolanaGlyph size={14}/> Solana</strong></div>
             <div><span>Verification</span><strong>{selected.isVerified?"Verified":"Unverified"}</strong></div>
