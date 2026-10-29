@@ -406,37 +406,30 @@ export default function Terminal(){
         </div>
       </div>
       <aside className="gravity-detail-sidebar">
-        <div className="gravity-trade-mode" role="group" aria-label="Trading mode">
-          <button type="button" className={tradeMode==="paper"?"active paper":""} aria-pressed={tradeMode==="paper"} onClick={()=>chooseTradeMode("paper")}>Paper</button>
-          <button type="button" className={tradeMode==="live"?"active live":""} aria-pressed={tradeMode==="live"} onClick={()=>chooseTradeMode("live")}>Live</button>
-        </div>
-        <div className="gravity-sidebar-token"><TokenIcon market={selected} size={30}/><div><strong>{selected.symbol} / USDC</strong><span>{tradeMode==="paper"?"Virtual funds · Demo positions":"Solana wallet · Live execution unavailable"}</span></div></div>
-        {tradeMode==="paper"?<div className="order-panel"><div className="order-title"><strong>Position</strong><span>VIRTUAL</span></div><div className="direction-switch"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div><div className="input-title"><span>Collateral</span><span>Available {dollar(freeBalance(positions))}</span></div><div className="amount-field"><input type="number" min="5" max="1000" step="5" value={margin} onChange={e=>setMargin(e.target.value)} aria-label="Paper collateral amount"/><span>USDC · DEMO</span></div><div className="input-title"><span>Leverage</span><span>MAX 3×</span></div><div className="leverage-options">{[1,2,3].map(n=><button className={lev===n?"active":""} key={n} onClick={()=>setLev(n)}>{n}×</button>)}</div><div className="order-summary"><div><span>Notional exposure</span><strong>{dollar((Number(margin)||0)*lev)}</strong></div><div><span>Entry price</span><strong>{dollar(currentPrice)}</strong></div><div><span>Open positions</span><strong>{selectedActive}</strong></div></div><button className="pill pill-accent order-submit" disabled={!canOpen||processing} onClick={openPaper}>{canOpen?`Open ${side}`:"Live price / collateral required"}</button></div>:
+        <div className="gravity-sidebar-token"><TokenIcon market={selected} size={30}/><div><strong>{selected.symbol} / USDC</strong><span>Live market data · Solana</span></div></div>
         <div className="order-panel gravity-live-ticket">
-          <div className="order-title"><strong>Live trading</strong><span>NOT ACTIVE</span></div>
+          <div className="order-title"><strong>Live market view</strong><span>NO ORDER EXECUTION</span></div>
           <div className="gravity-live-wallet">
             <span className="gravity-live-wallet-label"><Wallet size={15}/> Solana wallet</span>
             <strong>{walletAddress?walletAddress.slice(0,5)+"..."+walletAddress.slice(-5):"Not connected"}</strong>
-            <span className="gravity-live-wallet-detail">{walletAddress?"Wallet connected. No transactions will be requested.":"Connect a Solana wallet to view your address."}</span>
+            <span className="gravity-live-wallet-detail">{walletAddress?"Public address connected. No transactions are requested.":"Connect your Solana wallet to view your public address."}</span>
           </div>
           <div className="direction-switch" aria-label="Direction preview"><button className={side==="long"?"long active":"long"} onClick={()=>setSide("long")}>Long</button><button className={side==="short"?"short active":"short"} onClick={()=>setSide("short")}>Short</button></div>
           <div className="order-summary gravity-live-summary">
-            <div><span>Token price</span><strong>{dollar(currentPrice)}</strong></div>
-            <div><span>Wallet collateral</span><strong>Unavailable</strong></div>
-            <div><span>Order execution</span><strong className="gravity-live-unavailable">Not enabled</strong></div>
+            <div><span>Live market price</span><strong>{dollar(currentPrice)}</strong></div>
+            <div><span>Direction preview</span><strong className={side==="long"?"text-up":"text-down"}>{side.toUpperCase()}</strong></div>
+            <div><span>On-chain orders</span><strong className="gravity-live-unavailable">Unavailable</strong></div>
           </div>
           {!walletAddress&&<button type="button" className="gravity-live-connect" onClick={showWalletMenu}><Wallet size={15}/> Connect Solana wallet</button>}
           <button type="button" className="pill order-submit gravity-live-submit" disabled aria-disabled="true">Live orders unavailable</button>
-          <p className="gravity-live-disclosure">Wallet connection is active, but Gravity does not yet submit real orders. Live mode never uses your paper balance.</p>
-        </div>}
-        
+          <p className="gravity-live-disclosure">Live pricing and a direction preview only. Gravity does not yet execute orders, hold deposits, or settle positions on-chain.</p>
+        </div>
       </aside>
     </div>
   </section>}
-        </>:<div className="portfolio-layout gravity-section-enter"><div className="portfolio-summary"><div className="portfolio-hero"><span>VIRTUAL EQUITY</span><strong>{dollar(equity)}</strong><small>Not a real wallet balance</small></div><div><span>AVAILABLE COLLATERAL</span><strong>{dollar(freeBalance(positions))}</strong></div><div><span>LOCKED COLLATERAL</span><strong>{dollar(lockedMargin(positions))}</strong></div><div><span>REALIZED P&L</span><strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></div></div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Open positions <span className="subtle-count">{open.length}</span></span><span className="position-note">MARKS REFRESH EVERY ~15S</span></div>{open.length===0?<div className="feed-message position-empty"><Wallet size={24}/><strong>No open positions</strong><span>Find a token and choose long or short.</span><button onClick={()=>selectMarket(marketType)} className="pill pill-outline">Browse markets</button></div>:<div className="positions-list">{open.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>MARK</small><strong>{dollar(prices[p.mint])}</strong></div><div><small>UNREALIZED P&L</small><strong className={!prices[p.mint]?"":getPnl(p,prices[p.mint])>=0?"text-up":"text-down"}>{prices[p.mint]?`${getPnl(p,prices[p.mint])>=0?"+":"−"}${dollar(Math.abs(Math.max(-p.margin,getPnl(p,prices[p.mint]))))}`:"N/A"}</strong></div><button className="pill pill-outline position-close" disabled={!prices[p.mint]} onClick={()=>closePaper(p)}>Close</button></div>)}</div>}</div><div className="positions-panel"><div className="panel-bar"><span className="panel-title">Trade history <span className="subtle-count">{closed.length}</span></span></div>{closed.length===0?<div className="history-empty">Your closed positions will appear here.</div>:<div className="positions-list">{closed.map(p=><div className="position-row" key={p.id}><div className="position-asset"><TokenIcon market={p}/><span><strong>{p.symbol}</strong><small>{p.side.toUpperCase()} · {p.leverage}×</small></span></div><div><small>ENTRY</small><strong>{dollar(p.entry)}</strong></div><div><small>EXIT</small><strong>{dollar(p.exit)}</strong></div><div><small>REALIZED P&L</small><strong className={(p.pnl||0)>=0?"text-up":"text-down"}>{(p.pnl||0)>=0?"+":"−"}{dollar(Math.abs(p.pnl||0))}</strong></div><span className="closed-tag"><Check size={14}/> CLOSED</span></div>)}</div>}</div><div className="portfolio-fineprint"><CircleHelp size={16}/> Indicative P&L excludes fees, slippage, and funding. Virtual funds only, no real orders. Browser storage only.</div></div>}
       </div>
     </main>
-    <div className="axiom-statusbar"><div><SolanaGlyph size={14}/> Solana <span className="axiom-divider"/> {marketType==="stocks"?"STOCK TOKENS":"MEMECOIN MARKETS"} <span className="axiom-divider"/> {refreshed?"MARKETS LIVE":"MARKETS CONNECTING"}</div><div>{tradeOpen&&tradeMode==="live"?<span>Live execution <strong>Not enabled</strong></span>:<><span>Virtual balance <strong>{dollar(equity)}</strong></span><span>Open <strong>{open.length}</strong></span><span>Realized <strong className={realised>=0?"text-up":"text-down"}>{realised>=0?"+":"−"}{dollar(Math.abs(realised))}</strong></span></>}</div></div>
+    <div className="axiom-statusbar"><div><SolanaGlyph size={14}/> Solana <span className="axiom-divider"/> {marketType==="stocks"?"STOCK TOKENS":"MEMECOIN MARKETS"} <span className="axiom-divider"/> {refreshed?"MARKETS LIVE":"MARKETS CONNECTING"}</div><div><span>Live market data</span><span>Trading <strong>Not enabled yet</strong></span></div></div>
     {toast&&<div className="toast" role="status"><Check size={17}/>{toast}<button aria-label="Dismiss notification" onClick={()=>setToast("")}><X size={14}/></button></div>}
   </div>;
 }
