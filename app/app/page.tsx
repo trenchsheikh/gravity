@@ -238,12 +238,13 @@ export default function Terminal(){
     void refresh();const timer=setInterval(refresh,12000);
     return()=>{closed=true;clearInterval(timer)};
   },[tradeOpen,selected?.mint,pageVisible]);
+  const resultsReady=shownFeedKey===activeFeedKey;
   const visible=useMemo(()=>{
-    const list=watchOnly?watchlist.map(mint=>markets.find(m=>m.mint===mint)||catalog.find(m=>m.mint===mint)).filter((m):m is Market=>!!m):markets;
+    const list=watchOnly?watchlist.map(mint=>markets.find(m=>m.mint===mint)||catalog.find(m=>m.mint===mint)).filter((m):m is Market=>!!m):resultsReady?markets:[];
     if(tab==="new"&&marketType==="memes"&&!query.trim()&&!watchOnly) return list;
     const sortValue=(m:Market)=>sortBy==="cap"?m.marketCap:sortBy==="liquidity"?m.liquidityUsd:sortBy==="volume"?windowVolume(m,windowSize):windowChange(m,windowSize);
     return [...list].sort((a,b)=>(sortValue(b)??Number.NEGATIVE_INFINITY)-(sortValue(a)??Number.NEGATIVE_INFINITY));
-  },[markets,catalog,watchOnly,watchlist,tab,marketType,query,sortBy,windowSize]);
+  },[markets,catalog,watchOnly,watchlist,tab,marketType,query,sortBy,windowSize,resultsReady]);
   const selectMarket=(next:"memes"|"stocks")=>{
     if(view==="markets"&&!tradeOpen&&!watchOnly&&marketType===next&&!query.trim())return;
     requestSerial.current++;
@@ -255,7 +256,7 @@ export default function Terminal(){
       if(item&&Array.isArray(item.markets)&&Date.now()-item.time<6*3600000)cached=item;
     }catch{}
     setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);
-    setQuery("");setMarkets(cached?.markets||[]);setLoading(!cached);
+    setQuery("");setMarkets(cached?.markets||[]);setShownFeedKey(cached?next+":"+tab+":"+windowSize+":":"");setLoading(!cached);
     setError("");setCacheNotice(cached?"Updating saved markets":"");
     setRefreshed(cached?.time||null);setCacheTime(cached?.time||null);
   };
@@ -337,7 +338,7 @@ export default function Terminal(){
               <span className="axiom-time-label">Change</span>
               {(["5m","1h","6h","24h"] as const).map(w=><button key={w} className={windowSize===w?"selected":""} onClick={()=>setWindowSize(w)}>{w}</button>)}
               <span className="axiom-v-divider"/>
-              <button className="axiom-refresh" aria-label="Refresh token list" onClick={()=>setTick(v=>v+1)}><RefreshCw size={15} className={loading?"spin":""}/></button>
+              <button className="axiom-refresh" aria-label="Refresh token list" onClick={()=>setTick(v=>v+1)} disabled={fetching}><RefreshCw size={15} className={fetching?"spin":""}/></button>
             </div>
           </div>
           {cacheNotice&&<div className="gravity-cache-banner"><Activity size={15}/><span>{markets.length?"Showing available cached markets. ":""}{cacheNotice}</span></div>}
@@ -350,8 +351,8 @@ export default function Terminal(){
             </div>
             <div className="axiom-list-scroll">
               <div className="axiom-table-head axiom-cols"><span>Pair info</span><span>Market cap / move</span><span>Liquidity</span><span>Volume</span><span>24h trades</span><span>Token info</span><span>Action</span></div>
-              <div className="axiom-list-body">
-                {loading?Array.from({length:9},(_,i)=><div className="axiom-skeleton" key={i}><i/><span/><b/></div>)
+              <div className="axiom-list-body" aria-busy={fetching||(!watchOnly&&loading&&!resultsReady)}>
+                {(!watchOnly&&loading&&!resultsReady)?Array.from({length:9},(_,i)=><div className="axiom-skeleton" key={i}><i/><span/><b/></div>)
                 :error&&!visible.length?<div className="axiom-state"><CircleHelp size={26}/><strong>Live feed unavailable</strong><p>{error}</p><button onClick={()=>setTick(x=>x+1)}>Try again</button></div>
                 :visible.length===0?<div className="axiom-state"><Search size={26}/><strong>No tokens found</strong><p>{watchOnly?"Star tokens in the current feed to build your watchlist.":"Try another search, or switch market lists."}</p><button onClick={()=>{setQuery("");setWatchOnly(false);setTab("trending")}}>Show tokens</button></div>
                 :visible.map(m=>{
