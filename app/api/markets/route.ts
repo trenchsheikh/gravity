@@ -1,68 +1,122 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fromJupiter, isMint, Market } from "@/lib/markets";
+import { fromJupiter, isMint, Market, numeric } from "@/lib/markets";
 
 export const runtime = "nodejs";
-const BASE = "https://api.jup.ag/tokens/v2";
+export const maxDuration = 20;
+
+const JUPITER = "https://api.jup.ag/tokens/v2";
+const STONK = "https://www.stonkfun.xyz/api/public/v1";
 const KEY = process.env.JUPITER_API_KEY?.trim();
 
-function response(data: object, status = 200) {
-  return NextResponse.json(data, {
-    status,
-    headers: {"Cache-Control": status === 200 ? "public, s-maxage=12, stale-while-revalidate=30" : "no-store"}
-  });
+function response(data:object,status=200){
+  return NextResponse.json(data,{status,headers:{
+    "Cache-Control":status===200?"public, s-maxage=20, stale-while-revalidate=40":"no-store"
+  }});
 }
-
-async function jupiter(path: string): Promise<unknown[]> {
-  const res = await fetch(BASE + path, {
-    headers: {Accept: "application/json", ...(KEY ? {"x-api-key": KEY} : {})},
-    next: {revalidate: 12},
-    signal: AbortSignal.timeout(8500)
+async function jupiter(path:string):Promise<unknown[]>{
+  const res=await fetch(JUPITER+path,{
+    headers:{Accept:"application/json",...(KEY?{"x-api-key":KEY}:{})},
+    next:{revalidate:20},signal:AbortSignal.timeout(8500)
   });
-  if (!res.ok) {
-    const reason = (res.status === 401 || res.status === 403)
-      ? "Jupiter requires a valid API key. Configure JUPITER_API_KEY in Vercel."
-      : res.status === 429
-      ? "Jupiter's request limit was reached. Configure a Jupiter API key or retry shortly."
-      : "Jupiter token feed is temporarily unavailable.";
-    throw new Error(reason);
-  }
-  const data: unknown = await res.json();
-  if (!Array.isArray(data)) throw new Error("Unexpected Jupiter token response.");
+  if(!res.ok)throw Error(res.status===429?"Jupiter market data is rate-limited. Retry shortly.":res.status===401||res.status===403?"Jupiter API credentials need attention.":"Jupiter market data temporarily unavailable.");
+  const data:unknown=await res.json();
+  if(!Array.isArray(data))throw Error("Unexpected Jupiter token format");
   return data;
 }
-
-function normalize(data: unknown[], onlyPump: boolean): Market[] {
-  const found = new Map<string, Market>();
-  for (const token of data) {
-    if (!token || typeof token !== "object") continue;
-    const item = fromJupiter(token as Record<string, unknown>);
-    if (!item) continue;
-    // Without a reliable origin field in Jupiter V2, use the typical pump-suffix for discovery.
-    // Exact mint lookups still support tokens on any Solana launch venue.
-    if (onlyPump && !item.mint.toLowerCase().endsWith("pump")) continue;
-    if (!found.has(item.mint)) found.set(item.mint,item);
+function normalizeJupiter(data:unknown[],onlyPump:boolean):Market[]{
+  const seen=new Map<string,Market>();
+  for(const row of data){
+    if(!row||typeof row!=="object")continue;
+    const token=fromJupiter(row as Record<string,unknown>);
+    if(!token)continue;
+    if(onlyPump&&!token.mint.toLowerCase().endsWith("pump"))continue;
+    seen.set(token.mint,token);
   }
-  return [...found.values()];
+  return [...seen.values()];
 }
-
-export async function GET(request: NextRequest) {
-  const tab = request.nextUrl.searchParams.get("tab") === "trending" ? "trending" : "new";
-  const query = (request.nextUrl.searchParams.get("q") || "").trim().slice(0, 90);
-  const requestedWindow = request.nextUrl.searchParams.get("window");
-  const window = requestedWindow && ["5m","1h","6h","24h"].includes(requestedWindow) ? requestedWindow : "1h";
+type RecordAny=Record<string,unknown>;
+function asObj(v:unknown):RecordAny {return v&&typeof v==="object"&&!Array.isArray(v)?v as RecordAny:{}}
+function str(v:unknown):string{return typeof v==="string"?v.trim():""}
+function safeIcon(v:unknown):string|null{
+  if(typeof v!=="string"||v.length>1600)return null;
+  try {const url=new URL(v);return url.protocol==="https:"?v:null}catch{return null}
+}
+type StonkPair={mint:string;name:string;symbol:string;image:string|null;price:number|null;category:string};
+async function stockRegistry():Promise<StonkPair[]>{
+  const url=STONK+"/pairs?category=xstock";
+  const r=await fetch(url,{next:{revalidate:300},signal:AbortSignal.timeout(8500),headers:{Accept:"application/json"}});
+  if(!r.ok)throw Error("Stonk stock-token registry temporarily unavailable (HTTP "+r.status+").");
+  const raw:unknown=await r.json();
+  const root=asObj(raw),data=asObj(root.data);
+  const rows=Array.isArray(data.pairs)?data.pairs:Array.isArray(root.pairs)?root.pairs:Array.isArray(raw)?raw:[];
+  if(!rows.length)throw Error("Stonk did not return any stock-token pairs.");
+  const found=new Map<string,StonkPair>();
+  for(const item of rows){
+    const entry=asObj(item),quote=asObj(entry.quote),token=asObj(entry.token);
+    const mint=str(entry.mint)||str(entry.quoteMint)||str(entry.address)||str(quote.mint)||str(token.mint);
+    if(!isMint(mint))continue;
+    const category=(str(entry.category)||str(quote.category)||"xstock").toLowerCase();
+    if(!["xstock","xstocks","stock","stocks","etf"].includes(category))continue;
+    const symbol=str(entry.symbol)||str(quote.symbol)||str(token.symbol)||mint.slice(0,5);
+    const name=str(entry.name)||str(quote.name)||str(token.name)||symbol;
+    const market=asObj(entry.market),price=asObj(entry.price);
+    const value=numeric(entry.priceUsd)??numeric(entry.usdPrice)??numeric(market.priceUsd)??numeric(price.usd);
+    found.set(mint,{mint,symbol:symbol.slice(0,24),name:name.slice(0,90),image:safeIcon(entry.logo)||safeIcon(entry.icon)||safeIcon(entry.logoURI)||safeIcon(quote.logo)||safeIcon(token.logo),price:value,category});
+  }
+  if(!found.size)throw Error("Stonk registry returned no valid xStock mints.");
+  return [...found.values()].slice(0,100);
+}
+async function stockMarkets(query:string):Promise<Market[]>{
+  const pairs=await stockRegistry();
+  const filtered=query&&!isMint(query)?pairs.filter(p=>p.name.toLowerCase().includes(query.toLowerCase())||p.symbol.toLowerCase().includes(query.toLowerCase())):pairs;
+  const wanted=isMint(query)?filtered.filter(p=>p.mint===query):filtered;
+  if(!wanted.length)return [];
+  let enriched:Market[]=[];
+  try{
+    enriched=normalizeJupiter(await jupiter("/search?query="+encodeURIComponent(wanted.map(p=>p.mint).join(","))),false);
+  }catch{
+    // The verified Stonk mint list remains usable when Jupiter's price feed is unavailable.
+  }
+  const byMint=new Map(enriched.map(token=>[token.mint,token]));
+  return wanted.map(pair=>{
+    const match=byMint.get(pair.mint);
+    if(match)return {...match,category:"stock" as const,venue:"StonkFun",name:match.name||pair.name,symbol:match.symbol||pair.symbol,image:match.image||pair.image,url:"https://www.stonkfun.xyz/"};
+    return {
+      mint:pair.mint,name:pair.name,symbol:pair.symbol,image:pair.image,priceUsd:pair.price,
+      change24h:null,marketCap:null,volume24h:null,liquidityUsd:null,poolAddress:null,
+      dex:"StonkFun",createdAt:null,url:"https://www.stonkfun.xyz/",source:"stonk" as const,
+      change5m:null,change1h:null,change6h:null,volume5m:null,volume1h:null,volume6h:null,
+      buys24h:null,sells24h:null,holderCount:null,organicScore:null,isVerified:false,isSuspicious:false,
+      category:"stock" as const,venue:"StonkFun"
+    };
+  });
+}
+export async function GET(request:NextRequest){
+  const params=request.nextUrl.searchParams;
+  const tab=params.get("tab")==="trending"?"trending":"new";
+  const query=(params.get("q")||"").trim().slice(0,90);
+  const market=params.get("market")==="stocks"?"stocks":"memes";
+  const requested=params.get("window");
+  const window=requested&&["5m","1h","6h","24h"].includes(requested)?requested:"1h";
   try {
-    if (query) {
-      const result = normalize(await jupiter("/search?query=" + encodeURIComponent(query)), !isMint(query));
-      const markets = isMint(query) ? result.filter(m => m.mint === query) : result;
-      return response({markets: markets.slice(0,30), providers: ["Jupiter Tokens V2"], query, updatedAt: Date.now()});
+    if(market==="stocks"){
+      const list=await stockMarkets(query);
+      if(tab==="trending")list.sort((a,b)=>(b.marketCap??-1)-(a.marketCap??-1));
+      else list.sort((a,b)=>a.symbol.localeCompare(b.symbol));
+      return response({markets:list.slice(0,100),providers:["StonkFun registry","Jupiter Tokens V2"],updatedAt:Date.now(),market,tab,window});
     }
-    const endpoint = tab === "new" ? "/recent" : `/toptrending/${window}?limit=100`;
-    const result = normalize(await jupiter(endpoint),true);
-    if (tab === "new") result.sort((a,b)=>(b.createdAt || 0)-(a.createdAt || 0));
-    else result.sort((a,b)=>(b.volume24h || 0)-(a.volume24h || 0));
-    return response({markets:result.slice(0,80),providers:["Jupiter Tokens V2"],updatedAt:Date.now(),tab,window});
-  } catch (err) {
-    const message = err instanceof Error ? err.message : "Jupiter token data unavailable.";
-    return response({markets:[],providers:["Jupiter Tokens V2"],error:message},503);
+    if(query){
+      const listed=normalizeJupiter(await jupiter("/search?query="+encodeURIComponent(query)),!isMint(query));
+      return response({markets:(isMint(query)?listed.filter(m=>m.mint===query):listed).slice(0,30),
+        providers:["Jupiter Tokens V2"],updatedAt:Date.now(),market,query});
+    }
+    const endpoint=tab==="new"?"/recent":"/toptrending/"+window+"?limit=100";
+    const listed=normalizeJupiter(await jupiter(endpoint),true);
+    if(tab==="new")listed.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    else listed.sort((a,b)=>(b.volume24h||0)-(a.volume24h||0));
+    return response({markets:listed.slice(0,80),providers:["Jupiter Tokens V2"],updatedAt:Date.now(),market,tab,window});
+  }catch(error){
+    const message=error instanceof Error?error.message:"Market data temporarily unavailable.";
+    return response({markets:[],providers:market==="stocks"?["StonkFun registry","Jupiter Tokens V2"]:["Jupiter Tokens V2"],error:message,market},503);
   }
 }

@@ -12,7 +12,9 @@ export type Market = {
   dex: string;
   createdAt: number | null;
   url: string;
-  source: "jupiter";
+  source: "jupiter" | "stonk";
+  category?: "meme" | "stock";
+  venue?: string;
   change5m: number | null;
   change1h: number | null;
   change6h: number | null;
@@ -86,6 +88,7 @@ export function fromJupiter(item: Record<string, unknown>): Market | null {
     dex: "Jupiter",
     createdAt: Number.isFinite(firstPoolCreated) ? firstPoolCreated : null,
     url: `https://pump.fun/coin/${mint}`,
-    source: "jupiter"
+    source: "jupiter",
+    category: "meme"
   };
 }
