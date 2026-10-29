@@ -1435,3 +1435,41 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
   .gravity-chart-label{width:100%}
   .gravity-chart-timeframes{justify-content:space-between;width:100%}
 }
+
+
+/* Gravity two-market navigation: Pump.fun memes and StonkFun xStock assets. */
+.gravity-landing .gravity-hero-and{color:#8dc6ff;font-weight:400}
+.gravity-landing .simple-hero h1{font-size:clamp(43px,5.1vw,70px);line-height:1.15;letter-spacing:-.069em}
+.gravity-landing .simple-hero-copy>p{max-width:710px}
+.axiom-terminal .axiom-stonk-mark{
+ display:inline-flex;align-items:center;margin-left:5px;padding:2px 5px;
+ border:1px solid #39618a;background:#112b49;color:#98d4ff;
+ border-radius:4px;font-size:8px;letter-spacing:.07em;font-weight:760;
+ vertical-align:middle
+}
+.axiom-terminal .axiom-primary-nav button.active .axiom-stonk-mark{
+ color:#e5f4ff;background:#235080;border-color:#638db5
+}
+.axiom-terminal .axiom-source-pill{white-space:nowrap}
+@media(max-width:860px){
+ .axiom-terminal .axiom-header{gap:8px}
+ .axiom-terminal .axiom-header-left{min-width:0;flex:1;overflow:hidden}
+ .axiom-terminal .axiom-primary-nav{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;min-width:0}
+ .axiom-terminal .axiom-primary-nav::-webkit-scrollbar{display:none}
+ .axiom-terminal .axiom-primary-nav button{flex:none;min-width:max-content;font-size:11px;padding-inline:7px}
+ .axiom-terminal .axiom-header .axiom-primary-nav button:nth-child(2),
+ .axiom-terminal .axiom-header .axiom-primary-nav button:nth-child(3){display:inline-flex;align-items:center}
+ .axiom-terminal .axiom-stonk-mark{font-size:7px;padding:1px 3px;margin-left:3px}
+ .axiom-terminal .axiom-header-right{flex:none}
+}
+@media(max-width:620px){
+ .axiom-terminal .axiom-header{padding-inline:9px}
+ .axiom-terminal .axiom-header-left{gap:7px}
+ .axiom-terminal .brand{font-size:19px}
+ .axiom-terminal .axiom-primary-nav{gap:0}
+ .axiom-terminal .axiom-primary-nav button{height:50px;padding-inline:7px;font-size:10px}
+ .axiom-terminal .axiom-stonk-mark{display:none}
+ .axiom-terminal .axiom-header .axiom-network{display:none}
+ .axiom-terminal .axiom-header .axiom-home{height:25px;width:25px}
+ .gravity-landing .simple-hero h1{font-size:clamp(38px,9vw,53px)}
+}
