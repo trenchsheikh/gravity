@@ -257,7 +257,7 @@ export default function Terminal(){
       const item=cache[key];
       if(item&&Array.isArray(item.markets)&&Date.now()-item.time<6*3600000)cached=item;
     }catch{}
-    setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);
+    setMarketType(next);setView("markets");setWatchOnly(false);setTradeOpen(false);setFetching(false);
     setQuery("");setMarkets(cached?.markets||[]);setShownFeedKey(cached?next+":"+tab+":"+windowSize+":":"");setLoading(!cached);
     setError("");setCacheNotice("");
     setRefreshed(cached?.time||null);setCacheTime(cached?.time||null);
@@ -265,23 +265,23 @@ export default function Terminal(){
   const showWatchlist=()=>{
     requestSerial.current++;
     setView("markets");setTradeOpen(false);setWatchOnly(true);
-    setQuery("");setError("");
+    setQuery("");setError("");setFetching(false);
   };
   const showPortfolio=()=>{
     requestSerial.current++;
-    setTradeOpen(false);setView("positions");
+    setTradeOpen(false);setView("positions");setFetching(false);
   };
   const searchMarkets=(value:string)=>{
     requestSerial.current++;
     setQuery(value);setView("markets");setTradeOpen(false);
-    setWatchOnly(false);setError("");
+    setWatchOnly(false);setError("");setFetching(false);
   };
   const openTrade=(m:Market)=>{
     requestSerial.current++;
     const list=document.querySelector(".axiom-list-scroll");
     listScroll.current={top:window.scrollY,left:list?.scrollLeft||0,listTop:list?.scrollTop||0};
     setSelected(m);setDetailTab("overview");setSelectedLastUpdated(null);
-    setTradeOpen(true);setMobileTrading(true);
+    setTradeOpen(true);setMobileTrading(true);setFetching(false);
     window.scrollTo({top:0,behavior:"instant"});
   };
   const hideTrade=()=>{
