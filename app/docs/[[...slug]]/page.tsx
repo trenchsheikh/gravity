@@ -15,7 +15,7 @@ export async function generateMetadata({params}:{params:Promise<Params>}):Promis
   const article=findDoc(slug[0]||"overview");
   if(!article)return {};
   return {
-    title:article.slug==="overview"?"Documentation | Gravity":article.title+" | Gravity Docs",
+    title:article.slug==="overview"?"Documentation":article.title+" | Docs",
     description:article.description,
     alternates:{canonical:article.slug==="overview"?"/docs":"/docs/"+article.slug},
     openGraph:{title:article.title+" | Gravity Docs",description:article.description}
