@@ -6,7 +6,7 @@ export default function HeroArtwork(){
    src="/gravity-chart-hero.svg"
    width={1800}
    height={700}
-   alt="Blue price chart with green Long and red Short position markers"
+   alt="Blue chart with Long and Short directional markers"
    decoding="async"
    fetchPriority="high"
  />;

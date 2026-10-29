@@ -22,7 +22,7 @@ function Section({section}:{section:DocSection}){
 
 const quickLinks=[
  {slug:"market-discovery",title:"Explore markets",desc:"Memecoins, stocks, and useful market signals.",icon:Compass},
- {slug:"virtual-positions",title:"Virtual positions",desc:"Follow long and short exposure in one place.",icon:TrendingUp},
+ {slug:"live-trading",title:"Live mode",desc:"Explore market direction and execution status.",icon:TrendingUp},
  {slug:"wallet-connection",title:"Solana wallets",desc:"Connect and manage a compatible wallet.",icon:Wallet},
  {slug:"charts-and-data",title:"Charts & data",desc:"Read candles, intervals and price statistics.",icon:Layers3}
 ];
@@ -150,7 +150,7 @@ export default function DocsShell({article}:{article:DocArticle}){
      <aside className="gd-toc" aria-label="On this page">
        <div className="gd-toc-head">ON THIS PAGE</div>
        {article.sections.map((section,i)=><a key={section.id} href={"#"+section.id}><span>{String(i+1).padStart(2,"0")}</span>{section.title}</a>)}
-       <div className="gd-toc-bottom"><span className="gd-toc-status"><span/> Virtual positions</span><strong>Market data is real. Orders are not.</strong><Link href={docHref("risk-and-limits")}>Understand the limits <ArrowUpRight size={14}/></Link></div>
+       <div className="gd-toc-bottom"><span className="gd-toc-status"><span/> Live market data</span><strong>On-chain orders are not enabled yet.</strong><Link href={docHref("risk-and-limits")}>Understand the limits <ArrowUpRight size={14}/></Link></div>
      </aside>
    </div>
  </div>;
