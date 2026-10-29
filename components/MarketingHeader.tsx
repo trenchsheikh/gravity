@@ -2,6 +2,7 @@
 import {useEffect, useState} from "react";
 import Link from "next/link";
 import Brand from "@/components/Brand";
+import XSocialLink from "@/components/XSocialLink";
 
 export default function MarketingHeader(){
  const [compact,setCompact]=useState(false);
@@ -16,6 +17,6 @@ export default function MarketingHeader(){
   <nav aria-label="Primary navigation">
    <a href="#product">The platform</a><a href="#how">How it works</a><a href="#about">About Gravity</a>
   </nav>
-  <Link href="/app" className="pill pill-nav">Launch app</Link>
+  <div className="gravity-header-actions"><XSocialLink placement="header"/><Link href="/app" className="pill pill-nav">Launch app</Link></div>
  </header>;
 }

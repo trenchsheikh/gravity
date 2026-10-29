@@ -1671,3 +1671,47 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
   .axiom-terminal .gravity-connect-wallet{padding-inline:8px}
   .axiom-terminal .gravity-connect-wallet span::after{content:"Wallet"}
 }
+
+
+/* Gravity official X profile, with a compact header icon and visible handle. */
+.gravity-landing .gravity-header-actions{
+  display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0
+}
+.gravity-landing .gravity-x-social{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  color:#b4c9e2;text-decoration:none;font:650 13px Manrope,Arial,sans-serif;
+  letter-spacing:-.015em;white-space:nowrap;
+  transition:color .16s ease,background-color .16s ease,border-color .16s ease
+}
+.gravity-landing .gravity-x-social svg{width:17px;height:17px;flex:none}
+.gravity-landing .gravity-x-social:hover{color:#fff}
+.gravity-landing .gravity-x-social:focus-visible{
+ outline:2px solid #a7d9ff;outline-offset:3px
+}
+.gravity-landing .gravity-x-social-header{
+  min-height:42px;padding:0 13px;border:1px solid rgba(153,196,239,.18);
+  border-radius:999px;background:rgba(12,29,51,.3)
+}
+.gravity-landing .gravity-x-social-header:hover{
+  border-color:rgba(160,212,255,.47);background:rgba(26,55,92,.52)
+}
+.gravity-landing .gravity-footer-left{display:flex;align-items:center;gap:23px;flex-wrap:wrap}
+.gravity-landing .gravity-x-social-footer{font-size:13px;color:#a3c5e9}
+.gravity-landing .gravity-x-social-footer:hover{color:#e4f4ff}
+@media(max-width:1000px){
+ .gravity-landing .gravity-x-social-header{width:42px;padding:0}
+ .gravity-landing .gravity-x-social-header span{display:none}
+}
+@media(max-width:760px){
+ .gravity-landing .gravity-header-actions{gap:8px}
+ .gravity-landing .gravity-x-social-header{width:40px;min-height:40px}
+ .gravity-landing .gravity-footer-left{gap:15px}
+ .gravity-landing .gravity-x-social-footer{font-size:12px}
+}
+@media(max-width:390px){
+ .gravity-landing .gravity-x-social-header{width:36px;min-height:36px}
+ .gravity-landing .gravity-header-actions{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gravity-landing .gravity-x-social{transition:none}
+}

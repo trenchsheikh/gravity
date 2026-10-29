@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {Activity, ChartNoAxesCombined, Radar, Search, ShieldCheck, SlidersHorizontal, Target, TrendingUp} from "lucide-react";
 import MarketingHeader from "@/components/MarketingHeader";
+import XSocialLink from "@/components/XSocialLink";
 import HeroArtwork from "@/components/HeroArtwork";
 import { ShaderBackground } from "@/components/ui/shadow-blending";
 
@@ -113,6 +114,6 @@ export default function Home(){
     <div><PremiumToken variant="meme" id="gravity-cta-meme" size={48}/><span>Explore memecoins</span></div><div><PremiumToken variant="stock" id="gravity-cta-stock" size={48}/><span>Find stock tokens</span></div><div><TrendingUp size={34} strokeWidth={1.65}/><span>Choose your direction</span></div><div><ChartNoAxesCombined size={34} strokeWidth={1.65}/><span>Follow every move</span></div>
    </div>
   </section>
-  <footer className="footer frame"><span>© 2026 GRAVITY</span><span>Virtual funds only. No real orders. Tokenized stocks are not direct company shares. Not financial advice.</span></footer>
+  <footer className="footer frame"><div className="gravity-footer-left"><span>© 2026 GRAVITY</span><XSocialLink placement="footer"/></div><span>Virtual funds only. No real orders. Tokenized stocks are not direct company shares. Not financial advice.</span></footer>
  </main>;
 }
