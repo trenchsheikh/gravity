@@ -1502,3 +1502,82 @@ body,button,input,select,textarea{font-family:'Manrope',Arial,sans-serif}
   .axiom-terminal .gravity-compact-tabs button,
   .axiom-terminal .axiom-row{transition:none}
 }
+
+
+/* Quiet premium iconography on the atmospheric blue Gravity landing background.
+   No filled/icon-tile backgrounds; the token artwork itself is transparent outside its metal rim. */
+.gravity-landing .feature-icon,
+.gravity-landing .step-icon {
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  background:transparent;
+  border:0;
+  box-shadow:none;
+  border-radius:0;
+  color:#9dcdff;
+  flex:none;
+}
+.gravity-landing .feature-icon {width:42px;height:42px}
+.gravity-landing .feature-icon svg {
+  width:29px;height:29px;
+  filter:drop-shadow(0 2px 12px rgba(67,144,235,.22));
+  stroke-width:1.65;
+}
+.gravity-landing .step-icon {width:44px;height:44px}
+.gravity-landing .step-icon svg {
+  width:29px;height:29px;
+  stroke-width:1.65;
+  filter:drop-shadow(0 1px 9px rgba(88,158,241,.21));
+}
+.gravity-landing .steps>div {grid-template-columns:44px minmax(0,1fr);gap:18px}
+.gravity-landing .preview-avatar.premium-avatar {
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:0 0 46px;width:46px;height:46px;
+  padding:0;overflow:visible;border:0;border-radius:0;
+  background:transparent;box-shadow:none;
+}
+.gravity-landing .gravity-premium-token {
+  display:block;
+  overflow:visible;
+  flex:none;
+  filter:drop-shadow(0 6px 10px rgba(3,10,30,.65)) drop-shadow(0 0 6px rgba(90,162,240,.18));
+}
+.gravity-landing .preview-token-row {min-height:48px;gap:13px}
+.gravity-landing .preview-token-row b {color:#e5f2ff}
+.gravity-landing .preview-token-row small {color:#8fabc9}
+.gravity-landing .feature-card {border-color:rgba(141,181,226,.17)}
+.gravity-landing .feature-preview .preview-bar {color:#e5effd}
+.gravity-landing .feature-art.feature-preview {border-color:rgba(128,178,240,.23)}
+/* A single understated grid of benefits, not four separately shaded icon tiles. */
+.gravity-landing .cta-badges {gap:0;grid-template-columns:repeat(2,minmax(0,1fr))}
+.gravity-landing .cta-badges>div {
+  background:transparent;
+  border:0;
+  border-radius:0;
+  min-height:120px;
+  padding:20px 18px;
+  color:#e2efff;
+  font-size:15px;
+  line-height:1.35;
+  gap:17px;
+  justify-content:center;
+  align-items:flex-start;
+  position:relative;
+}
+.gravity-landing .cta-badges>div:nth-child(odd) {border-right:1px solid rgba(127,173,225,.16)}
+.gravity-landing .cta-badges>div:nth-child(-n+2) {border-bottom:1px solid rgba(127,173,225,.16)}
+.gravity-landing .cta-badges svg:not(.gravity-premium-token) {
+  color:#9fcbff;
+  filter:drop-shadow(0 2px 9px rgba(69,134,226,.16));
+}
+.gravity-landing .cta-badges .gravity-premium-token {margin:-5px 0}
+@media(max-width:760px) {
+  .gravity-landing .step-icon {width:38px;height:38px}
+  .gravity-landing .steps>div {grid-template-columns:38px minmax(0,1fr);gap:14px}
+  .gravity-landing .cta-badges>div {min-height:104px;padding:15px 10px;font-size:13px;gap:13px}
+  .gravity-landing .cta-badges .gravity-premium-token {width:39px;height:39px}
+}
+@media(prefers-reduced-motion:reduce) {
+  .gravity-landing .gravity-premium-token {transition:none}
+}
